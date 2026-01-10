@@ -3,6 +3,8 @@ import tseslint from 'typescript-eslint';
 import globals from 'globals';
 import unicorn from 'eslint-plugin-unicorn';
 import prettierPlugin from 'eslint-plugin-prettier';
+import perfectionist from 'eslint-plugin-perfectionist';
+import importPlugin from 'eslint-plugin-import';
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -22,22 +24,21 @@ export default tseslint.config(
     ],
   },
   {
-    languageOptions: {
-      globals: { ...globals.browser },
-      parserOptions: {
-        projectService: true,
-        // tsconfigRootDir: import.meta.dirname,
-      },
-    },
+    languageOptions: { globals: { ...globals.browser }, parserOptions: { projectService: true } },
     linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true },
-    plugins: {
-      import: await import('eslint-plugin-import'),
-      prettier: prettierPlugin,
-      perfectionist: await import('eslint-plugin-perfectionist'),
+    plugins: { import: importPlugin, prettier: prettierPlugin, perfectionist: perfectionist },
+
+    settings: {
+      'import/resolver': {
+        typescript: { project: ['./tsconfig.json'] },
+        node: { extensions: ['.js', '.ts'] },
+      },
     },
     rules: {
       'prettier/prettier': 'error',
-      'import/no-cycle': 'error',
+      // 'import/no-cycle': 'error',
+      'import/no-cycle': ['error', { maxDepth: Infinity, ignoreExternal: true }],
+      'import/no-self-import': 'error',
       'unicorn/no-null': 'off',
       'unicorn/prevent-abbreviations': ['error', { allowList: { env: true } }],
       'lines-between-class-members': ['error', 'always'],
@@ -65,6 +66,7 @@ export default tseslint.config(
       '@typescript-eslint/default-param-last': 'error',
       'no-magic-numbers': 'off',
       '@typescript-eslint/no-magic-numbers': ['error', { ignore: [0, 1, -1] }],
+      'perfectionist/sort-imports': 'error',
     },
   }
 );

@@ -9,11 +9,11 @@ max_line_length = 100
 trim_trailing_whitespace = true
 insert_final_newline = true
 
-[*.{js,ts,jsx,tsx}]
+[*.{js,ts}]
 indent_size = 2
 max_line_length = 100
 
-[*.{html,css,scss,less}]
+[*.{html,css}]
 indent_size = 2
 max_line_length = 100
 
