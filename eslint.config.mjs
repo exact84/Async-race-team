@@ -1,23 +1,28 @@
 import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
-import globals from 'globals';
-import unicorn from 'eslint-plugin-unicorn';
-import prettierPlugin from 'eslint-plugin-prettier';
-import perfectionist from 'eslint-plugin-perfectionist';
 import importPlugin from 'eslint-plugin-import';
+import perfectionist from 'eslint-plugin-perfectionist';
+import prettierPlugin from 'eslint-plugin-prettier';
+import unicorn from 'eslint-plugin-unicorn';
+import { defineConfig } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
-export default tseslint.config(
+export default defineConfig(
   eslint.configs.recommended,
   tseslint.configs.recommendedTypeChecked,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   unicorn.configs.recommended,
+  // importPlugin.configs.recommended,
+  perfectionist.configs['recommended-natural'],
   {
     ignores: [
       'dist',
       'node_modules',
       '**/*config.js',
       '**/*config.ts',
+      '**/*config.mjs',
+      '**/*config.mts',
       '.prettierrc.js',
       '**/*.spec.ts',
       '.stylelintrc.js',
@@ -26,18 +31,14 @@ export default tseslint.config(
   {
     languageOptions: { globals: { ...globals.browser }, parserOptions: { projectService: true } },
     linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true },
-    plugins: { import: importPlugin, prettier: prettierPlugin, perfectionist: perfectionist },
+    plugins: { prettier: prettierPlugin, import: importPlugin },
 
-    settings: {
-      'import/resolver': {
-        typescript: { project: ['./tsconfig.json'] },
-        node: { extensions: ['.js', '.ts'] },
-      },
-    },
+    languageOptions: { parserOptions: { projectService: true } },
+    settings: { 'import/resolver': { typescript: true, node: { extensions: ['.js', '.ts'] } } },
     rules: {
       'prettier/prettier': 'error',
-      // 'import/no-cycle': 'error',
-      'import/no-cycle': ['error', { maxDepth: Infinity, ignoreExternal: true }],
+      'import/no-cycle': 'error',
+      // 'import/no-cycle': ['error', { maxDepth: Infinity, ignoreExternal: true }],
       'import/no-self-import': 'error',
       'unicorn/no-null': 'off',
       'unicorn/prevent-abbreviations': ['error', { allowList: { env: true } }],
