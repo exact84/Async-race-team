@@ -1,7 +1,7 @@
 import eslint from '@eslint/js';
 import importPlugin from 'eslint-plugin-import';
 import perfectionist from 'eslint-plugin-perfectionist';
-import prettierPlugin from 'eslint-plugin-prettier';
+import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
 import unicorn from 'eslint-plugin-unicorn';
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
@@ -13,8 +13,9 @@ export default defineConfig(
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   unicorn.configs.recommended,
-  // importPlugin.configs.recommended,
   perfectionist.configs['recommended-natural'],
+  importPlugin.flatConfigs.typescript,
+  eslintPluginPrettier,
   {
     ignores: [
       'dist',
@@ -31,12 +32,11 @@ export default defineConfig(
   {
     languageOptions: { globals: { ...globals.browser }, parserOptions: { projectService: true } },
     linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true },
-    plugins: { prettier: prettierPlugin, import: importPlugin },
+
     settings: { 'import/resolver': { typescript: true, node: { extensions: ['.js', '.ts'] } } },
     rules: {
       'prettier/prettier': 'error',
       'import/no-cycle': 'error',
-      // 'import/no-cycle': ['error', { maxDepth: Infinity, ignoreExternal: true }],
       'import/no-self-import': 'error',
       'unicorn/no-null': 'off',
       'unicorn/prevent-abbreviations': ['error', { allowList: { env: true } }],
