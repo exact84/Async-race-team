@@ -32,8 +32,6 @@ export default defineConfig(
     languageOptions: { globals: { ...globals.browser }, parserOptions: { projectService: true } },
     linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true },
     plugins: { prettier: prettierPlugin, import: importPlugin },
-
-    languageOptions: { parserOptions: { projectService: true } },
     settings: { 'import/resolver': { typescript: true, node: { extensions: ['.js', '.ts'] } } },
     rules: {
       'prettier/prettier': 'error',
