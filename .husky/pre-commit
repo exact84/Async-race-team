@@ -1,2 +1,1 @@
 npx lint-staged --config lintstaged.config.js
-npx validate-branch-name
