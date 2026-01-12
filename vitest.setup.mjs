@@ -5,8 +5,15 @@ import { server } from './__mocks__/node';
 
 expect.extend(matchers);
 
-beforeAll(() => server.listen());
+beforeAll(() => {
+  server.listen();
+});
 
-afterEach(() => server.resetHandlers());
+afterEach(() => {
+  server.resetHandlers();
+  document.body.replaceChildren();
+});
 
-afterAll(() => server.close());
+afterAll(() => {
+  server.close();
+});
