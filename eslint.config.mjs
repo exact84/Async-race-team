@@ -24,6 +24,7 @@ export default defineConfig(
       '**/*config.ts',
       '**/*config.mjs',
       '**/*config.mts',
+      '**/*setup.mjs',
       '.prettierrc.js',
       '**/*.spec.ts',
       '.stylelintrc.js',
