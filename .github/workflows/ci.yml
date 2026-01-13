@@ -17,6 +17,7 @@ on:
 jobs:
   validate-branch-name:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Check branch name
         run: |
@@ -24,7 +25,7 @@ jobs:
 
           if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|chore|refactor)/[a-z0-9._-]+$ ]]; then
             echo "❌ Invalid branch name: $BRANCH_NAME"
-            echo "Allowed patterns: feature/*, fix/*, chore/* or refactor"
+            echo "Allowed patterns: feature/*, fix/*, chore/* or refactor/*"
             exit 1
           fi
 
