@@ -1,4 +1,8 @@
-export const MOCK_CARS = [
-  { color: 'red', id: 1, name: 'Tesla' },
-  { color: 'black', id: 2, name: 'Aton Martin' },
+export const MOCK_CARS_ARRAY = [
+  { color: 'red', id: 0, name: 'Tesla' },
+  { color: 'black', id: 1, name: 'Aton Martin' },
 ];
+
+export const MOCK_SINGLE_CAR = { color: 'black', id: 1, name: 'Ferrari' };
+
+export const MOCK_ENGINE_STATE = { velocity: 64, distance: 100 };
