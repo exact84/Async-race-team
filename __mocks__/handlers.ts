@@ -13,7 +13,7 @@ export const handlers = [
   }),
 
   http.head(TEST_URL + '/garage', () => {
-    return HttpResponse.json(null, { headers: { 'mock-header': 'mock-header' } });
+    return new HttpResponse(null, { headers: { 'mock-header': 'mock-header' } });
   }),
 
   http.delete(TEST_URL + '/garage/:id', ({ params }) => {
@@ -32,7 +32,7 @@ export const handlers = [
     return HttpResponse.json(newPost);
   }),
 
-  http.patch(TEST_URL + '/garage/:id', () => {
+  http.patch(TEST_URL + '/garage', () => {
     return HttpResponse.json(MOCK_ENGINE_STATE);
   }),
 ];

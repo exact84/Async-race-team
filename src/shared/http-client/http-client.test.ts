@@ -73,7 +73,7 @@ describe(httpClient.put.name, () => {
 describe(httpClient.patch.name, () => {
   it('patches entity', async () => {
     const response = await httpClient.patch({
-      path: buildTestUrl(TEST_ENDPOINT.GARAGE_ID(0)),
+      path: buildTestUrl(TEST_ENDPOINT.GARAGE),
       typeGuard: testTypeGuard(true),
     });
 
