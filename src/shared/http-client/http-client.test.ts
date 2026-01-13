@@ -3,11 +3,13 @@ import { MOCK_CARS_ARRAY, MOCK_ENGINE_STATE } from '../../../__mocks__/data';
 import { buildTestUrl, testTypeGuard } from '../../../__mocks__/test-utilities';
 import { httpClient } from './http-client';
 
+const passGuard = testTypeGuard(true);
+
 describe(httpClient.get.name, () => {
   it('returns array of data', async () => {
     const response = await httpClient.get({
       path: buildTestUrl(TEST_ENDPOINT.GARAGE),
-      typeGuard: testTypeGuard(true),
+      typeGuard: passGuard,
     });
 
     expect(response).toEqual(MOCK_CARS_ARRAY);
@@ -16,7 +18,7 @@ describe(httpClient.get.name, () => {
   it('returns single entity', async () => {
     const response = await httpClient.get({
       path: buildTestUrl(TEST_ENDPOINT.GARAGE_ID(0)),
-      typeGuard: testTypeGuard(true),
+      typeGuard: passGuard,
     });
 
     expect(response).toEqual(MOCK_CARS_ARRAY[0]);
@@ -35,7 +37,7 @@ describe(httpClient.delete.name, () => {
   it('deletes entity', async () => {
     const response = await httpClient.delete({
       path: buildTestUrl(TEST_ENDPOINT.GARAGE_ID(0)),
-      typeGuard: testTypeGuard(true),
+      typeGuard: passGuard,
     });
 
     expect(response).toEqual(MOCK_CARS_ARRAY.filter((car) => car.id !== 0));
@@ -49,7 +51,7 @@ describe(httpClient.post.name, () => {
     const response = await httpClient.post({
       body: newCar,
       path: buildTestUrl(TEST_ENDPOINT.GARAGE),
-      typeGuard: testTypeGuard(true),
+      typeGuard: passGuard,
     });
 
     expect(response).toEqual(newCar);
@@ -63,7 +65,7 @@ describe(httpClient.put.name, () => {
     const response = await httpClient.put({
       body: newCar,
       path: buildTestUrl(TEST_ENDPOINT.GARAGE_ID(0)),
-      typeGuard: testTypeGuard(true),
+      typeGuard: passGuard,
     });
 
     expect(response).toEqual(newCar);
@@ -74,7 +76,7 @@ describe(httpClient.patch.name, () => {
   it('patches entity', async () => {
     const response = await httpClient.patch({
       path: buildTestUrl(TEST_ENDPOINT.GARAGE),
-      typeGuard: testTypeGuard(true),
+      typeGuard: passGuard,
     });
 
     expect(response).toEqual(MOCK_ENGINE_STATE);
