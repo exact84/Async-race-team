@@ -1,6 +1,6 @@
+import { TEST_ENDPOINT } from '../../../__mocks__/constants';
 import { MOCK_CARS_ARRAY, MOCK_ENGINE_STATE } from '../../../__mocks__/data';
-import { buildTestUrl, TEST_ENDPOINT } from '../../../__mocks__/handlers';
-import { testTypeGuard } from '../../../__mocks__/mock-test-functions';
+import { buildTestUrl, testTypeGuard } from '../../../__mocks__/test-utilities';
 import { httpClient } from './http-client';
 
 describe(httpClient.get.name, () => {

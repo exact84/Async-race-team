@@ -1,6 +1,6 @@
 import type { BaseRequestOptions } from './types';
 
-import { testTypeGuard } from '../../../__mocks__/mock-test-functions';
+import { testTypeGuard } from '../../../__mocks__/test-utilities';
 import {
   checkResponse,
   extractHeaders,
