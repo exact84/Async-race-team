@@ -6,4 +6,4 @@ export type DriveMetrics = z.infer<typeof driveMetricsSchema>;
 
 export type DriveResult = z.infer<typeof driveResultSchema>;
 
-export type EngineState = 'started' | 'stopped';
+export type EngineStatus = 'started' | 'stopped';
