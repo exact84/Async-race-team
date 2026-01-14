@@ -1,5 +1,5 @@
 import { TEST_ENDPOINT } from '../../../__mocks__/constants';
-import { MOCK_CARS_ARRAY, MOCK_ENGINE_STATE } from '../../../__mocks__/data';
+import { MOCK_CARS_ARRAY, MOCK_STARTED_ENGINE_METRICS } from '../../../__mocks__/data';
 import { buildTestUrl, testTypeGuard } from '../../../__mocks__/test-utilities';
 import { httpClient } from './http-client';
 
@@ -79,6 +79,6 @@ describe(httpClient.patch.name, () => {
       typeGuard: passGuard,
     });
 
-    expect(response).toEqual(MOCK_ENGINE_STATE);
+    expect(response).toEqual(MOCK_STARTED_ENGINE_METRICS);
   });
 });
