@@ -13,7 +13,7 @@ export function extractHeaders(response: Response): Headers {
   return response.headers;
 }
 
-export function extractJson(response: Response): unknown {
+export function extractJson(response: Response): Promise<unknown> {
   return response.json();
 }
 
