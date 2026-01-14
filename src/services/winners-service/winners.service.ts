@@ -37,7 +37,7 @@ export class WinnersService {
 
   public delete(id: number, signal?: AbortSignal): Promise<object> {
     return this.http.delete({
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id)),
+      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
       signal,
       typeGuard: isEmptyObject,
     });
@@ -45,7 +45,7 @@ export class WinnersService {
 
   public get(id: number, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.get({
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id)),
+      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
       signal,
       typeGuard: isWinnerRecord,
     });
@@ -78,18 +78,18 @@ export class WinnersService {
       .then(extractTotalCountHeader);
   }
 
-  public update(
+  public upsert(
     id: number,
     body: Omit<WinnerRecord, 'id'>,
     signal?: AbortSignal
   ): Promise<WinnerRecord> {
-    return this.get(id, signal)
-      .then((existing) => this.mergeStats(existing, body))
-      .catch(() => this.create(body, signal))
-      .then((merged) => this.save(merged, signal));
+    return this.get(id, signal).then(
+      (existing) => this.update(this.mergeRecords(existing, body)),
+      () => this.create(body, signal)
+    );
   }
 
-  private mergeStats(existing: WinnerRecord, incoming: Omit<WinnerRecord, 'id'>): WinnerRecord {
+  private mergeRecords(existing: WinnerRecord, incoming: Omit<WinnerRecord, 'id'>): WinnerRecord {
     return {
       id: existing.id,
       time: Math.min(existing.time, incoming.time),
@@ -97,10 +97,10 @@ export class WinnersService {
     };
   }
 
-  private save(stats: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
+  private update(stats: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.put({
-      body: { time: stats.time, wins: stats.wins },
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(stats.id)),
+      body: stats,
+      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(stats.id), { id: stats.id }),
       signal,
       typeGuard: isWinnerRecord,
     });

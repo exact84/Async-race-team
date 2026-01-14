@@ -6,6 +6,7 @@ import {
   MOCK_STARTED_ENGINE_METRICS,
   MOCK_STOPPED_ENGINE_METRICS,
   MOCK_SUCCESS_DRIVE_RESULT,
+  MOCK_WINNER_RECORDS_ARRAY,
 } from './data';
 
 export const handlers = [
@@ -66,5 +67,68 @@ export const handlers = [
     }
 
     return HttpResponse.json(MOCK_STARTED_ENGINE_METRICS);
+  }),
+
+  http.get(TEST_URL + '/winners', () => {
+    return HttpResponse.json(MOCK_WINNER_RECORDS_ARRAY);
+  }),
+
+  http.get(TEST_URL + '/winners/:id', ({ params, request }) => {
+    const url = new URL(request.url);
+
+    const queryId = url.searchParams.get('id');
+    const parameterId = params.id;
+
+    const record = MOCK_WINNER_RECORDS_ARRAY.find(
+      (record) => record.id === Number(queryId) || record.id === Number(parameterId)
+    );
+
+    if (!queryId || !record) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json(record);
+  }),
+
+  http.post(TEST_URL + '/winners', async ({ request }) => {
+    const newRecord = await request.clone().json();
+
+    return HttpResponse.json(newRecord);
+  }),
+
+  http.delete(TEST_URL + '/winners/:id', ({ params, request }) => {
+    const url = new URL(request.url);
+
+    const queryId = url.searchParams.get('id');
+    const parameterId = params.id;
+
+    const record = MOCK_WINNER_RECORDS_ARRAY.find(
+      (record) => record.id === Number(queryId) || record.id === Number(parameterId)
+    );
+
+    if (!record) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json({});
+  }),
+
+  http.put(TEST_URL + '/winners/:id', async ({ params, request }) => {
+    const updatedRecord = await request.clone().json();
+
+    const url = new URL(request.url);
+
+    const queryId = url.searchParams.get('id');
+    const parameterId = params.id;
+
+    const record = MOCK_WINNER_RECORDS_ARRAY.find(
+      (record) => record.id === Number(queryId) || record.id === Number(parameterId)
+    );
+
+    if (!record) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json(updatedRecord);
   }),
 ];
