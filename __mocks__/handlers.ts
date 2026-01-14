@@ -131,4 +131,10 @@ export const handlers = [
 
     return HttpResponse.json(updatedRecord);
   }),
+
+  http.head(TEST_URL + '/winners', () => {
+    return new HttpResponse(null, {
+      headers: { 'X-Total-Count': MOCK_WINNER_RECORDS_ARRAY.length.toString() },
+    });
+  }),
 ];

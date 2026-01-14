@@ -85,3 +85,11 @@ describe(winnersService.upsert.name, () => {
     await expect(winnersService.delete(id)).rejects.toThrow();
   });
 });
+
+describe(winnersService.getTotalCount.name, () => {
+  it('returns total count header', async () => {
+    const count = await winnersService.getTotalCount();
+
+    expect(count).toBe(MOCK_WINNER_RECORDS_ARRAY.length.toString());
+  });
+});
