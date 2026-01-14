@@ -78,10 +78,10 @@ export class WinnersService {
       .then(extractTotalCountHeader);
   }
 
-  public update(stats: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
+  public update(record: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.put({
-      body: stats,
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(stats.id), { id: stats.id }),
+      body: record,
+      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(record.id), { id: record.id }),
       signal,
       typeGuard: isWinnerRecord,
     });
