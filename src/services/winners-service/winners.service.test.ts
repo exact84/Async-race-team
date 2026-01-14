@@ -56,9 +56,27 @@ describe(winnersService.upsert.name, () => {
   it('updates existing record', async () => {
     const id = 2;
 
+    const updateSpy = vi.spyOn(winnersService, 'update');
+
     const response = await winnersService.upsert(id, { time: 2, wins: 2 });
 
     expect(response).toEqual({ id, time: 2, wins: 3 });
+
+    expect(updateSpy).toBeCalled();
+
+    updateSpy.mockRestore();
+  });
+
+  it('creates record if it does not exist', async () => {
+    const id = 555;
+
+    const createSpy = vi.spyOn(winnersService, 'create');
+
+    await expect(winnersService.upsert(id, { time: 2, wins: 2 })).rejects.toThrow();
+
+    expect(createSpy).toBeCalled();
+
+    createSpy.mockRestore();
   });
 
   it('throws error if record not found', async () => {

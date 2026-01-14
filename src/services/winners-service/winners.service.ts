@@ -78,6 +78,15 @@ export class WinnersService {
       .then(extractTotalCountHeader);
   }
 
+  public update(stats: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
+    return this.http.put({
+      body: stats,
+      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(stats.id), { id: stats.id }),
+      signal,
+      typeGuard: isWinnerRecord,
+    });
+  }
+
   public upsert(
     id: number,
     body: Omit<WinnerRecord, 'id'>,
@@ -95,14 +104,5 @@ export class WinnersService {
       time: Math.min(existing.time, incoming.time),
       wins: existing.wins + 1,
     };
-  }
-
-  private update(stats: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
-    return this.http.put({
-      body: stats,
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(stats.id), { id: stats.id }),
-      signal,
-      typeGuard: isWinnerRecord,
-    });
   }
 }
