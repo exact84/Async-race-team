@@ -20,6 +20,7 @@ export default defineConfig(
     ignores: [
       'dist',
       'node_modules',
+      'coverage',
       '**/*config.js',
       '**/*config.ts',
       '**/*config.mjs',
