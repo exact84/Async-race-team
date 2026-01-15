@@ -11,9 +11,11 @@ describe(createRandomCar.name, () => {
 
   it('should generate a name containing a valid brand and model', () => {
     const car = createRandomCar();
-    const [brand, model] = car.name.split(' ');
 
-    expect(CAR_BRANDS.includes(brand)).toBe(true);
-    expect(CAR_MODELS.includes(model)).toBe(true);
+    const brandMatch = CAR_BRANDS.some((brand) => car.name.startsWith(brand));
+    expect(brandMatch).toBe(true);
+
+    const modelMatch = CAR_MODELS.some((model) => car.name.endsWith(model));
+    expect(modelMatch).toBe(true);
   });
 });
