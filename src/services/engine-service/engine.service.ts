@@ -1,6 +1,6 @@
-import type { HttpClient } from '../../shared/http-client/http-client';
 import type { DriveMetrics, DriveResult, EngineStatus } from './types';
 
+import { type HttpClient } from '../../shared/http-client/http-client';
 import { API_ENDPOINT } from '../constants';
 import { buildApiUrl } from '../utilities';
 import { isDriveMetrics, isDriveResult } from './type-guards';
@@ -10,7 +10,7 @@ export class EngineService {
 
   private http: HttpClient;
 
-  public constructor(http: HttpClient) {
+  private constructor(http: HttpClient) {
     this.http = http;
   }
 
