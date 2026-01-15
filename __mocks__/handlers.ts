@@ -14,28 +14,69 @@ export const handlers = [
     return HttpResponse.json(MOCK_CARS_ARRAY);
   }),
 
-  http.get(TEST_URL + '/garage/:id', ({ params }) => {
-    return HttpResponse.json(MOCK_CARS_ARRAY.find((car) => car.id === Number(params.id)));
+  http.get(TEST_URL + '/garage/:id', ({ params, request }) => {
+    const url = new URL(request.url);
+
+    const queryId = url.searchParams.get('id');
+    const parameterId = params.id;
+
+    const car = MOCK_CARS_ARRAY.find(
+      (car) => car.id === Number(queryId) || car.id === Number(parameterId)
+    );
+
+    if (!queryId || !car) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json(car);
   }),
 
   http.head(TEST_URL + '/garage', () => {
-    return new HttpResponse(null, { headers: { 'mock-header': 'mock-header' } });
+    return new HttpResponse(null, {
+      headers: { 'X-Total-Count': MOCK_CARS_ARRAY.length.toString() },
+    });
   }),
 
-  http.delete(TEST_URL + '/garage/:id', ({ params }) => {
-    return HttpResponse.json(MOCK_CARS_ARRAY.filter((car) => car.id !== Number(params.id)));
+  http.delete(TEST_URL + '/garage/:id', ({ params, request }) => {
+    const url = new URL(request.url);
+
+    const queryId = url.searchParams.get('id');
+    const parameterId = params.id;
+
+    const car = MOCK_CARS_ARRAY.find(
+      (car) => car.id === Number(queryId) || car.id === Number(parameterId)
+    );
+
+    if (!car) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json({});
   }),
 
   http.post(TEST_URL + '/garage', async ({ request }) => {
-    const newPost = await request.clone().json();
+    const newCar = await request.clone().json();
 
-    return HttpResponse.json(newPost);
+    return HttpResponse.json(newCar);
   }),
 
-  http.put(TEST_URL + '/garage/:id', async ({ request }) => {
-    const newPost = await request.clone().json();
+  http.put(TEST_URL + '/garage/:id', async ({ params, request }) => {
+    const updatedCar = await request.clone().json();
 
-    return HttpResponse.json(newPost);
+    const url = new URL(request.url);
+
+    const queryId = url.searchParams.get('id');
+    const parameterId = params.id;
+
+    const car = MOCK_CARS_ARRAY.find(
+      (car) => car.id === Number(queryId) || car.id === Number(parameterId)
+    );
+
+    if (!car) {
+      return new HttpResponse(null, { status: 404 });
+    }
+
+    return HttpResponse.json(updatedCar);
   }),
 
   http.patch(TEST_URL + '/garage', () => {

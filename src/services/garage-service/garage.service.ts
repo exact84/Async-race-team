@@ -67,7 +67,7 @@ export class GarageService {
 
   public update(id: number, body: Omit<Car, 'id'>, signal?: AbortSignal): Promise<Car> {
     return this.http.put({
-      body,
+      body: { color: body.color, id, name: body.name },
       path: buildApiUrl(API_ENDPOINT.GARAGE_ID(id), { id }),
       signal,
       typeGuard: isCar,
