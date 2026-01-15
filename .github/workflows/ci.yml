@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - development
+      - develop
       - 'feature/*'
       - 'fix/*'
       - 'chore/*'
@@ -12,7 +12,7 @@ on:
   pull_request:
     branches:
       - main
-      - development
+      - develop
 
 jobs:
   validate-branch-name:
@@ -23,7 +23,7 @@ jobs:
         run: |
           BRANCH_NAME="${{ github.head_ref }}"
 
-          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|chore|refactor)/[a-z0-9._-]+$ ]]; then
+          if [[ ! "$BRANCH_NAME" =~ ^(feature|fix|chore|refactor)/[a-z0-9._-]+$ ]] && [[ "$BRANCH_NAME" != "develop" ]]; then
             echo "❌ Invalid branch name: $BRANCH_NAME"
             echo "Allowed patterns: feature/*, fix/*, chore/* or refactor/*"
             exit 1
