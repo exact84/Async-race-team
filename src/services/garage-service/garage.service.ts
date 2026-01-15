@@ -5,9 +5,11 @@ import { isEmptyObject } from '../../shared/type-guards';
 import { API_ENDPOINT } from '../constants';
 import { buildApiUrl, extractTotalCountHeader } from '../utilities';
 import { isCar, isCarsArray } from './type-guards';
+import { createRandomCar } from './utilities';
 
 const DEFAULT_LIMIT = 7;
 const DEFAULT_PAGE = 1;
+const DEFAULT_RANDOM_CARS_AMOUNT = 100;
 
 export class GarageService {
   private static instance: GarageService | null = null;
@@ -31,6 +33,15 @@ export class GarageService {
       signal,
       typeGuard: isCar,
     });
+  }
+
+  public createRandomCars(
+    amount = DEFAULT_RANDOM_CARS_AMOUNT,
+    signal?: AbortSignal
+  ): Promise<Car[]> {
+    const promises = Array.from({ length: amount }, () => this.create(createRandomCar(), signal));
+
+    return Promise.all(promises);
   }
 
   public delete(id: number, signal?: AbortSignal): Promise<object> {
