@@ -45,10 +45,10 @@ export class RaceService {
     return this.instance;
   }
 
-  public startCarSingle(car: Car, callbacks: SingleCarCallbacks): void {
+  public startCarSingle(car: Car, callbacks: SingleCarCallbacks): Promise<void> {
     const { signal } = callbacks;
 
-    this.startEngine(car, signal)
+    return this.startEngine(car, signal)
       .then(() => this.engineService.drive(car.id, signal))
       .then(
         () => {
