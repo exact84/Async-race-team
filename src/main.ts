@@ -35,4 +35,10 @@ winnersButton.addEventListener('click', () => {
   winnersService.getAll().then(console.warn, console.warn);
 });
 
-document.body.append(startRaceButton, winnersButton);
+const stop = document.createElement('button');
+stop.textContent = 'Stop race';
+stop.addEventListener('click', () => {
+  raceService.stopRace().then(console.warn, console.warn);
+});
+
+document.body.append(startRaceButton, winnersButton, stop);

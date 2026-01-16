@@ -17,6 +17,8 @@ export class RaceService {
 
   private readonly garageService: GarageService;
 
+  private raceAbortController: AbortController | null = new AbortController();
+
   private startedEngines = new Set<number>();
 
   private winnerDeclared = false;
@@ -61,14 +63,14 @@ export class RaceService {
   public startRace(callbacks: RaceCallbacks): Promise<void> {
     this.winnerDeclared = false;
 
-    const { signal } = callbacks;
+    const signal = this.recreateRaceAbortController(callbacks.signal);
 
     callbacks.onRaceStart();
 
     return this.garageService
       .getAll({ signal })
       .then((cars) => Promise.all(this.startAllEngines(cars, signal)))
-      .then((engines) => this.driveAllCars(engines, callbacks))
+      .then((engines) => this.driveAllCars(engines, { ...callbacks, signal }))
       .then(() => {
         callbacks.onRaceEnded();
       });
@@ -80,10 +82,13 @@ export class RaceService {
       .finally(() => this.startedEngines.delete(carId));
   }
 
-  public stopRace(): void {
+  public stopRace(): Promise<void> {
+    this.raceAbortController?.abort();
+    this.raceAbortController = null;
+
     this.winnerDeclared = false;
 
-    this.stopAllEngines().then(console.warn, console.error);
+    return this.stopAllEngines();
   }
 
   private driveAllCars(
@@ -93,6 +98,25 @@ export class RaceService {
     const promises = engines.map((engine) => this.startCarRace(engine, callbacks));
 
     return Promise.allSettled(promises);
+  }
+
+  private recreateRaceAbortController(parentSignal: AbortSignal): AbortSignal {
+    if (this.raceAbortController) {
+      this.raceAbortController.abort();
+      this.raceAbortController = null;
+    }
+
+    this.raceAbortController = new AbortController();
+
+    parentSignal.addEventListener(
+      'abort',
+      () => {
+        this.raceAbortController?.abort();
+      },
+      { once: true }
+    );
+
+    return this.raceAbortController.signal;
   }
 
   private startAllEngines(cars: Car[], signal: AbortSignal): Promise<CarWithDriveMetrics>[] {
@@ -107,7 +131,7 @@ export class RaceService {
     const start = Date.now();
 
     return this.engineService.drive(car.id, signal).then(
-      () => {
+      async () => {
         if (!this.winnerDeclared) {
           const end = Date.now() - start;
 
@@ -115,7 +139,7 @@ export class RaceService {
 
           this.winnerDeclared = true;
 
-          void this.winnersService.upsert(car.id, { time: end, wins: 1 }, signal);
+          await this.winnersService.upsert(car.id, { time: end, wins: 1 }, signal);
         }
       },
       () => {
