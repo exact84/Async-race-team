@@ -3,16 +3,12 @@ import type { DriveMetrics } from '../engine-service/types';
 import type { GarageService } from '../garage-service/garage.service';
 import type { Car } from '../garage-service/types';
 import type { WinnersService } from '../winners-service/winners.service';
-
-type CarWithDriveMetrics = Car & DriveMetrics;
-
-interface RaceOptions {
-  onCarCrash(car: Car): void;
-  onRaceEnded(): void;
-  onRaceStart(): void;
-  onWinner(car: Car, time: number): void;
-  signal: AbortSignal;
-}
+import type {
+  CarRaceCallbacks,
+  CarWithDriveMetrics,
+  RaceCallbacks,
+  SingleCarCallbacks,
+} from './types';
 
 export class RaceService {
   private static instance: null | RaceService = null;
@@ -47,37 +43,34 @@ export class RaceService {
     return this.instance;
   }
 
-  public startCarSingle(
-    car: Car,
-    options: { onCrash(car: Car): void; onFinish(car: Car): void; signal: AbortSignal }
-  ): void {
-    const { signal } = options;
+  public startCarSingle(car: Car, callbacks: SingleCarCallbacks): void {
+    const { signal } = callbacks;
 
     this.startEngine(car, signal)
       .then(() => this.engineService.drive(car.id, signal))
       .then(
         () => {
-          options.onFinish(car);
+          callbacks.onFinish(car);
         },
         () => {
-          options.onCrash(car);
+          callbacks.onCrash(car);
         }
       );
   }
 
-  public startRace(options: RaceOptions): Promise<void> {
+  public startRace(callbacks: RaceCallbacks): Promise<void> {
     this.winnerDeclared = false;
 
-    const { signal } = options;
+    const { signal } = callbacks;
 
-    options.onRaceStart();
+    callbacks.onRaceStart();
 
     return this.garageService
       .getAll({ signal })
       .then((cars) => Promise.all(this.startAllEngines(cars, signal)))
-      .then((engines) => this.driveAllCars(engines, options))
+      .then((engines) => this.driveAllCars(engines, callbacks))
       .then(() => {
-        options.onRaceEnded();
+        callbacks.onRaceEnded();
       });
   }
 
@@ -95,13 +88,9 @@ export class RaceService {
 
   private driveAllCars(
     engines: CarWithDriveMetrics[],
-    options: {
-      onCarCrash(car: Car): void;
-      onWinner(car: Car, time: number): void;
-      signal: AbortSignal;
-    }
+    callbacks: CarRaceCallbacks
   ): Promise<PromiseSettledResult<void>[]> {
-    const promises = engines.map((engine) => this.startCarRace(engine, options));
+    const promises = engines.map((engine) => this.startCarRace(engine, callbacks));
 
     return Promise.allSettled(promises);
   }
@@ -112,32 +101,25 @@ export class RaceService {
     return cars.map((car) => stopPromise.then(() => this.startEngine(car, signal)));
   }
 
-  private startCarRace(
-    car: Car,
-    options: {
-      onCarCrash(car: Car): void;
-      onWinner(car: Car, time: number): void;
-      signal: AbortSignal;
-    }
-  ): Promise<void> {
+  private startCarRace(car: Car, callbacks: CarRaceCallbacks): Promise<void> {
+    const { signal } = callbacks;
+
     const start = Date.now();
 
-    return this.engineService.drive(car.id, options.signal).then(
+    return this.engineService.drive(car.id, signal).then(
       () => {
         if (!this.winnerDeclared) {
           const end = Date.now() - start;
 
-          options.onWinner(car, end);
+          callbacks.onWinner(car, end);
 
           this.winnerDeclared = true;
 
-          this.winnersService
-            .upsert(car.id, { time: end, wins: 1 }, options.signal)
-            .then(console.warn, console.warn);
+          void this.winnersService.upsert(car.id, { time: end, wins: 1 }, signal);
         }
       },
       () => {
-        options.onCarCrash(car);
+        callbacks.onCarCrash(car);
       }
     );
   }
