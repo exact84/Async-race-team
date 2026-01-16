@@ -1,26 +1,43 @@
-/* eslint-disable perfectionist/sort-objects */
-import type { ButtonProperties } from './types';
+import { div } from '@ripetchor/dom';
 
-import { Component } from '../../shared/base-component/base-component';
+import { Component, defineElement } from '../../shared/component/component';
 import styles from './button.module.css';
 
-export class MyButton extends Component<ButtonProperties> {
-  private button: HTMLButtonElement;
+export interface ButtonProperties {
+  buttonSize?: ButtonSize;
+  onClick?(): void;
+  onToggle?(): void;
+  textContent: string;
+}
+
+export type ButtonSize = 'lg' | 'md' | 'sm';
+
+export class Button extends Component<ButtonProperties> {
+  private abortController = new AbortController();
+
+  private buttonElement = div(
+    {
+      className: this.props.buttonSize
+        ? styles.button + ' ' + styles[`button-${this.props.buttonSize}`]
+        : styles.button,
+      click: () => this.props.onClick?.(),
+      signal: this.abortController.signal,
+      toggle: () => this.props.onToggle?.(),
+    },
+    this.props.textContent
+  );
 
   public constructor(properties: ButtonProperties) {
     super(properties);
+  }
 
-    this.button = document.createElement('button');
-    this.button.addEventListener('click', () => {
-      this.props.onClick();
-    });
+  public disconnectedCallback(): void {
+    this.abortController.abort();
   }
 
   public render(): HTMLElement {
-    const { label, disabled = false, size = 'm' } = this.props;
-    this.button.className = `${styles.button} ${styles[`button-${size}`]}`;
-    this.button.textContent = label;
-    this.button.disabled = disabled;
-    return this.button;
+    return this.buttonElement;
   }
 }
+
+defineElement('button', Button);

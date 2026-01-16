@@ -1,23 +1,25 @@
 .button {
   cursor: pointer;
+  width: fit-content;
   padding: 0.5em 1em;
   border: none;
   border-radius: 4px;
-  background-color: #eee;
+  color: var(--bg-color);
+  background-color: var(--accent-color);
   transition: background-color 0.3s;
 }
 
-.button-s {
+.button-sm {
   padding: 0.25rem 0.5rem;
   font-size: 12px;
 }
 
-.button-m {
+.button-md {
   padding: 0.5rem 1rem;
   font-size: 18px;
 }
 
-.button-l {
+.button-lg {
   padding: 0.75rem 1.5rem;
   font-size: 22px;
 }
@@ -27,6 +29,9 @@
   opacity: 0.6;
 }
 
-.button:hover:not(:disabled) {
-  background-color: aqua;
+@media (hover: hover) {
+  .button:not(:disabled):hover {
+    color: var(--bg-color);
+    background-color: var(--accent-color-hover);
+  }
 }
