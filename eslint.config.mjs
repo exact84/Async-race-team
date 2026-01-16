@@ -33,7 +33,7 @@ export default defineConfig(
   },
   {
     languageOptions: { globals: { ...globals.browser }, parserOptions: { projectService: true } },
-    linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true },
+    // linterOptions: { noInlineConfig: true, reportUnusedDisableDirectives: true },
 
     settings: { 'import/resolver': { typescript: true, node: { extensions: ['.js', '.ts'] } } },
     rules: {

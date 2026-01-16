@@ -1,0 +1,40 @@
+.button {
+  cursor: pointer;
+  user-select: none;
+  width: fit-content;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 4px;
+  color: var(--bg-color);
+  background-color: var(--accent-color);
+  transition:
+    background-color 0.3s ease-in-out,
+    color 0.3s ease-in-out;
+}
+
+.button-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 12px;
+}
+
+.button-md {
+  padding: 0.5rem 1rem;
+  font-size: 18px;
+}
+
+.button-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 22px;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (hover: hover) {
+  .button:not(:disabled):hover {
+    color: var(--bg-color);
+    background-color: var(--accent-color-hover);
+  }
+}
