@@ -1,11 +1,11 @@
 import { getByTestId } from '@testing-library/dom';
 
+import { render } from '../../../__mocks__/test-utilities';
 import { CAR_IMAGE_SIZE, CarImage } from './car-image';
 
 describe(CarImage.name, () => {
   it('should render to DOM', () => {
-    const carImage = new CarImage({ color: 'red' });
-    document.body.append(carImage);
+    const carImage = render(() => new CarImage({ color: 'red' }));
 
     expect(carImage).toBeInTheDocument();
   });
@@ -14,8 +14,7 @@ describe(CarImage.name, () => {
     const firstColor = 'red';
     const secondColor = 'blue';
 
-    const carImage = new CarImage({ color: firstColor });
-    document.body.append(carImage);
+    const carImage = render(() => new CarImage({ color: firstColor }));
 
     const icon = getByTestId(carImage, 'car-icon');
 
@@ -27,8 +26,7 @@ describe(CarImage.name, () => {
   });
 
   it('should set default size', () => {
-    const carImage = new CarImage({ color: 'red' });
-    document.body.append(carImage);
+    const carImage = render(() => new CarImage({ color: 'red' }));
 
     const icon = getByTestId(carImage, 'car-icon');
 
@@ -36,8 +34,7 @@ describe(CarImage.name, () => {
   });
 
   it('should set passed size', () => {
-    const carImage = new CarImage({ color: 'red', size: 'lg' });
-    document.body.append(carImage);
+    const carImage = render(() => new CarImage({ color: 'red', size: 'lg' }));
 
     const icon = getByTestId(carImage, 'car-icon');
 
