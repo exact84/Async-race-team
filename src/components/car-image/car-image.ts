@@ -9,7 +9,11 @@ export interface CarImageProperties {
 
 type CarImageSize = 'lg' | 'md' | 'sm';
 
-const SIZE_MAP: Record<CarImageSize, string> = { lg: styles.lg, md: styles.md, sm: styles.sm };
+export const CAR_IMAGE_SIZE: Record<CarImageSize, string> = {
+  lg: styles.lg,
+  md: styles.md,
+  sm: styles.sm,
+};
 
 // TODO: Remove Component and defineElement fn ========================================================================================
 type UpdateFunction<S> = (state: S) => Partial<S>;
@@ -71,14 +75,14 @@ abstract class Component<P extends object = object, S extends object = object> e
 }
 
 export class CarImage extends Component<CarImageProperties> {
-  private readonly carIcon = div({ className: styles.icon });
+  private readonly carIcon = div({ 'className': styles.icon, 'data-testid': 'car-icon' });
 
   public constructor(properties: CarImageProperties) {
     super(properties);
 
     this.classList.add(styles.container);
 
-    this.setSize(SIZE_MAP[properties.size ?? 'sm']);
+    this.setSize(CAR_IMAGE_SIZE[properties.size ?? 'sm']);
     this.setColor(properties.color);
   }
 
