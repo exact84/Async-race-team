@@ -5,8 +5,8 @@ export function getRandomHexColor(): string {
   let color = '#';
 
   for (let index = 0; index < STRING_LENGTH; index++) {
-    const index = Math.floor(Math.random() * hexDigits.length);
-    color += hexDigits[index];
+    const randomIndex = Math.floor(Math.random() * hexDigits.length);
+    color += hexDigits[randomIndex];
   }
 
   return color;
