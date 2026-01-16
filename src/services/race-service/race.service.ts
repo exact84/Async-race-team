@@ -163,7 +163,7 @@ export class RaceService {
   }
 
   private stopAllEngines(): Promise<void> {
-    const promises = Array.from(this.startedEngines, (cardId) => this.stopEngine(cardId));
+    const promises = Array.from(this.startedEngines, (carId) => this.stopEngine(carId));
 
     return Promise.all(promises).then(() => {
       this.startedEngines.clear();
