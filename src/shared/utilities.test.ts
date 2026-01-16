@@ -1,4 +1,4 @@
-import { getRandomHexColor, getRandomItem } from './utilities';
+import { fragment, getRandomHexColor, getRandomItem } from './utilities';
 
 describe(getRandomHexColor.name, () => {
   it('should return a string starting with #', () => {
@@ -29,5 +29,13 @@ describe(getRandomItem.name, () => {
     const item = getRandomItem(array);
 
     expect(array.includes(item)).toBe(true);
+  });
+});
+
+describe(fragment.name, () => {
+  it('qweqw', () => {
+    const result = fragment();
+
+    expect(result).toBeInstanceOf(DocumentFragment);
   });
 });
