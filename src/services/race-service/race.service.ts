@@ -4,10 +4,10 @@ import type { GarageService } from '../garage-service/garage.service';
 import type { Car } from '../garage-service/types';
 import type { WinnersService } from '../winners-service/winners.service';
 import type {
-  CarRaceCallbacks,
+  CarRaceParameters,
   CarWithDriveMetrics,
-  RaceCallbacks,
-  SingleCarCallbacks,
+  RaceParameters,
+  SingleCarParameters,
 } from './types';
 
 export class RaceService {
@@ -45,34 +45,34 @@ export class RaceService {
     return this.instance;
   }
 
-  public startCarSingle(car: Car, callbacks: SingleCarCallbacks): Promise<void> {
-    const { signal } = callbacks;
+  public startCarSingle(car: Car, parameters: SingleCarParameters): Promise<void> {
+    const { signal } = parameters;
 
     return this.startEngine(car, signal)
       .then(() => this.engineService.drive(car.id, signal))
       .then(
         () => {
-          callbacks.onFinish(car);
+          parameters.onFinish(car);
         },
         () => {
-          callbacks.onCrash(car);
+          parameters.onCrash(car);
         }
       );
   }
 
-  public startRace(callbacks: RaceCallbacks): Promise<void> {
+  public startRace(parameters: RaceParameters): Promise<void> {
     this.winnerDeclared = false;
 
-    const signal = this.recreateRaceAbortController(callbacks.signal);
+    const signal = this.recreateRaceAbortController(parameters.signal);
 
-    callbacks.onRaceStart();
+    parameters.onRaceStart();
 
     return this.garageService
       .getAll({ signal })
       .then((cars) => Promise.all(this.startAllEngines(cars, signal)))
-      .then((engines) => this.driveAllCars(engines, { ...callbacks, signal }))
+      .then((engines) => this.driveAllCars(engines, { ...parameters, signal }))
       .then(() => {
-        callbacks.onRaceEnded();
+        parameters.onRaceEnded();
       });
   }
 
@@ -93,9 +93,9 @@ export class RaceService {
 
   private driveAllCars(
     engines: CarWithDriveMetrics[],
-    callbacks: CarRaceCallbacks
+    parameters: CarRaceParameters
   ): Promise<PromiseSettledResult<void>[]> {
-    const promises = engines.map((engine) => this.startCarRace(engine, callbacks));
+    const promises = engines.map((engine) => this.startCarRace(engine, parameters));
 
     return Promise.allSettled(promises);
   }
@@ -125,8 +125,8 @@ export class RaceService {
     return cars.map((car) => stopPromise.then(() => this.startEngine(car, signal)));
   }
 
-  private startCarRace(car: Car, callbacks: CarRaceCallbacks): Promise<void> {
-    const { signal } = callbacks;
+  private startCarRace(car: Car, parameters: CarRaceParameters): Promise<void> {
+    const { signal } = parameters;
 
     const start = Date.now();
 
@@ -135,7 +135,7 @@ export class RaceService {
         if (!this.winnerDeclared) {
           const end = Date.now() - start;
 
-          callbacks.onWinner(car, end);
+          parameters.onWinner(car, end);
 
           this.winnerDeclared = true;
 
@@ -143,7 +143,7 @@ export class RaceService {
         }
       },
       () => {
-        callbacks.onCarCrash(car);
+        parameters.onCarCrash(car);
       }
     );
   }

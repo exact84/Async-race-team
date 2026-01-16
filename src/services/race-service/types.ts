@@ -1,16 +1,16 @@
 import type { DriveMetrics } from '../engine-service/types';
 import type { Car } from '../garage-service/types';
 
-export type CarRaceCallbacks = CarCrashCallback & SignalOption & WinnerCallback;
+export type CarRaceParameters = CarCrashCallback & SignalOption & WinnerCallback;
 
 export type CarWithDriveMetrics = Car & DriveMetrics;
 
-export type RaceCallbacks = CarCrashCallback &
+export type RaceParameters = CarCrashCallback &
   RaceLifecycleCallbacks &
   SignalOption &
   WinnerCallback;
 
-export interface SingleCarCallbacks extends SignalOption {
+export interface SingleCarParameters extends SignalOption {
   onCrash(car: Car): void;
   onFinish(car: Car): void;
 }
