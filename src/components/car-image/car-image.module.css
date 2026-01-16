@@ -1,0 +1,27 @@
+.container {
+  display: block;
+  width: max-content;
+  background-color: transparent;
+}
+
+.icon {
+  background-color: transparent;
+  mask-image: url('../../assets/truck.svg');
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.sm {
+  width: 40px;
+  height: 40px;
+}
+
+.md {
+  width: 60px;
+  height: 60px;
+}
+
+.lg {
+  width: 80px;
+  height: 80px;
+}

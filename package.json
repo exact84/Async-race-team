@@ -19,6 +19,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@ripetchor/dom": "^1.0.15",
     "modern-normalize": "^3.0.1",
     "zod": "^4.3.5"
   },
