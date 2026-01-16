@@ -23,7 +23,7 @@ export abstract class Component<
     return this.props;
   }
 
-  public abstract render(): HTMLElement;
+  public abstract render(): DocumentFragment | HTMLElement;
 
   protected connectedCallback(): void {
     this.update();
