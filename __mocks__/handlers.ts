@@ -8,51 +8,23 @@ import {
   MOCK_SUCCESS_DRIVE_RESULT,
   MOCK_WINNER_RECORDS_ARRAY,
 } from './data';
+import { createCrudHandlers, findById, getId } from './handler-utilities';
 
 export const handlers = [
-  http.get(TEST_URL + '/garage', () => {
-    return HttpResponse.json(MOCK_CARS_ARRAY);
-  }),
+  ...createCrudHandlers(TEST_URL + '/garage', MOCK_CARS_ARRAY),
+  ...createCrudHandlers(TEST_URL + '/winners', MOCK_WINNER_RECORDS_ARRAY),
 
-  http.get(TEST_URL + '/garage/:id', ({ params }) => {
-    return HttpResponse.json(MOCK_CARS_ARRAY.find((car) => car.id === Number(params.id)));
-  }),
-
-  http.head(TEST_URL + '/garage', () => {
-    return new HttpResponse(null, { headers: { 'mock-header': 'mock-header' } });
-  }),
-
-  http.delete(TEST_URL + '/garage/:id', ({ params }) => {
-    return HttpResponse.json(MOCK_CARS_ARRAY.filter((car) => car.id !== Number(params.id)));
-  }),
-
-  http.post(TEST_URL + '/garage', async ({ request }) => {
-    const newPost = await request.clone().json();
-
-    return HttpResponse.json(newPost);
-  }),
-
-  http.put(TEST_URL + '/garage/:id', async ({ request }) => {
-    const newPost = await request.clone().json();
-
-    return HttpResponse.json(newPost);
-  }),
-
-  http.patch(TEST_URL + '/garage', () => {
-    return HttpResponse.json(MOCK_STARTED_ENGINE_METRICS);
-  }),
+  http.patch(TEST_URL + '/garage', () => HttpResponse.json(MOCK_STARTED_ENGINE_METRICS)),
 
   http.patch(TEST_URL + '/engine', ({ request }) => {
-    const url = new URL(request.url);
-
-    const id = url.searchParams.get('id');
-    const status = url.searchParams.get('status');
-
-    const car = MOCK_CARS_ARRAY.find((car) => car.id === Number(id));
+    const id = getId({}, request);
+    const car = findById(MOCK_CARS_ARRAY, id);
 
     if (!car) {
       return new HttpResponse(null, { status: 404 });
     }
+
+    const status = new URL(request.url).searchParams.get('status');
 
     if (status === 'stopped') {
       const target = 0.5;
@@ -67,74 +39,5 @@ export const handlers = [
     }
 
     return HttpResponse.json(MOCK_STARTED_ENGINE_METRICS);
-  }),
-
-  http.get(TEST_URL + '/winners', () => {
-    return HttpResponse.json(MOCK_WINNER_RECORDS_ARRAY);
-  }),
-
-  http.get(TEST_URL + '/winners/:id', ({ params, request }) => {
-    const url = new URL(request.url);
-
-    const queryId = url.searchParams.get('id');
-    const parameterId = params.id;
-
-    const record = MOCK_WINNER_RECORDS_ARRAY.find(
-      (record) => record.id === Number(queryId) || record.id === Number(parameterId)
-    );
-
-    if (!queryId || !record) {
-      return new HttpResponse(null, { status: 404 });
-    }
-
-    return HttpResponse.json(record);
-  }),
-
-  http.post(TEST_URL + '/winners', async ({ request }) => {
-    const newRecord = await request.clone().json();
-
-    return HttpResponse.json(newRecord);
-  }),
-
-  http.delete(TEST_URL + '/winners/:id', ({ params, request }) => {
-    const url = new URL(request.url);
-
-    const queryId = url.searchParams.get('id');
-    const parameterId = params.id;
-
-    const record = MOCK_WINNER_RECORDS_ARRAY.find(
-      (record) => record.id === Number(queryId) || record.id === Number(parameterId)
-    );
-
-    if (!record) {
-      return new HttpResponse(null, { status: 404 });
-    }
-
-    return HttpResponse.json({});
-  }),
-
-  http.put(TEST_URL + '/winners/:id', async ({ params, request }) => {
-    const updatedRecord = await request.clone().json();
-
-    const url = new URL(request.url);
-
-    const queryId = url.searchParams.get('id');
-    const parameterId = params.id;
-
-    const record = MOCK_WINNER_RECORDS_ARRAY.find(
-      (record) => record.id === Number(queryId) || record.id === Number(parameterId)
-    );
-
-    if (!record) {
-      return new HttpResponse(null, { status: 404 });
-    }
-
-    return HttpResponse.json(updatedRecord);
-  }),
-
-  http.head(TEST_URL + '/winners', () => {
-    return new HttpResponse(null, {
-      headers: { 'X-Total-Count': MOCK_WINNER_RECORDS_ARRAY.length.toString() },
-    });
   }),
 ];

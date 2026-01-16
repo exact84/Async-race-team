@@ -17,7 +17,7 @@ describe(httpClient.get.name, () => {
 
   it('returns single entity', async () => {
     const response = await httpClient.get({
-      path: buildTestUrl(TEST_ENDPOINT.GARAGE_ID(0)),
+      path: buildTestUrl(TEST_ENDPOINT.GARAGE_ID(0), { id: 0 }),
       typeGuard: passGuard,
     });
 
@@ -29,7 +29,7 @@ describe(httpClient.head.name, () => {
   it('returns headers', async () => {
     const headers = await httpClient.head({ path: buildTestUrl(TEST_ENDPOINT.GARAGE) });
 
-    expect(headers.get('mock-header')).toBe('mock-header');
+    expect(headers.get('X-Total-Count')).toBe(MOCK_CARS_ARRAY.length.toString());
   });
 });
 
@@ -40,7 +40,7 @@ describe(httpClient.delete.name, () => {
       typeGuard: passGuard,
     });
 
-    expect(response).toEqual(MOCK_CARS_ARRAY.filter((car) => car.id !== 0));
+    expect(response).toEqual({});
   });
 });
 
