@@ -1,5 +1,6 @@
 import type { HttpClient } from '../../shared/http-client/http-client';
-import type { GetAllOptions, WinnerRecord } from './types';
+import type { GarageService } from '../garage-service/garage.service';
+import type { GetAllOptions, WinnerRecord, WinnerWithCarData } from './types';
 
 import { isEmptyObject } from '../../shared/type-guards';
 import { API_ENDPOINT } from '../constants';
@@ -14,14 +15,17 @@ const DEFAULT_SORT_ORDER = 'ASC';
 export class WinnersService {
   private static instance: null | WinnersService = null;
 
+  private readonly garageService;
+
   private http: HttpClient;
 
-  private constructor(http: HttpClient) {
+  private constructor(http: HttpClient, garageService: GarageService) {
     this.http = http;
+    this.garageService = garageService;
   }
 
-  public static getInstance(http: HttpClient): WinnersService {
-    this.instance ??= new WinnersService(http);
+  public static getInstance(http: HttpClient, garageService: GarageService): WinnersService {
+    this.instance ??= new WinnersService(http, garageService);
 
     return this.instance;
   }
@@ -51,7 +55,7 @@ export class WinnersService {
     });
   }
 
-  public getAll(options: GetAllOptions = {}): Promise<WinnerRecord[]> {
+  public getAll(options: GetAllOptions = {}): Promise<WinnerWithCarData[]> {
     const {
       limit = DEFAULT_LIMIT,
       order = DEFAULT_SORT_ORDER,
@@ -60,15 +64,27 @@ export class WinnersService {
       sort = DEFAULT_SORT_FIELD,
     } = options;
 
-    return this.http.get({
-      signal,
-      typeGuard: isWinnerRecordsArray,
-      url: buildApiUrl(API_ENDPOINT.WINNERS, {
-        _limit: limit,
-        _order: order,
-        _page: page,
-        _sort: sort,
-      }),
+    const url = buildApiUrl(API_ENDPOINT.WINNERS, {
+      _limit: limit,
+      _order: order,
+      _page: page,
+      _sort: sort,
+    });
+
+    return this.http.get({ signal, typeGuard: isWinnerRecordsArray, url }).then((records) => {
+      return Promise.all(
+        records.map((record) => {
+          return this.garageService
+            .get(record.id)
+            .then((car) => ({
+              color: car.color,
+              id: record.id,
+              name: car.name,
+              time: record.time,
+              wins: record.wins,
+            }));
+        })
+      );
     });
   }
 

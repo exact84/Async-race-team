@@ -15,3 +15,8 @@ export type SortField = 'id' | 'time' | 'wins';
 export type SortOrder = 'ASC' | 'DESC';
 
 export type WinnerRecord = z.infer<typeof winnerRecordSchema>;
+
+export interface WinnerWithCarData extends WinnerRecord {
+  color: string;
+  name: string;
+}
