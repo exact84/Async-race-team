@@ -5,6 +5,7 @@
   --color-green-dark: #1d8758;
   --color-rebeccapurple: rebeccapurple;
   --color-purple: #9575cd;
+  --transition-duration: 0.3s;
 
   color-scheme: light dark;
 }

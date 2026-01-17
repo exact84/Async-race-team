@@ -12,8 +12,8 @@
   background-color: var(--accent-color);
 
   transition:
-    background-color 0.3s ease-in-out,
-    color 0.3s ease-in-out;
+    background-color var(--transition-duration) ease-in-out,
+    color var(--transition-duration) ease-in-out;
 }
 
 .button-sm {
