@@ -29,9 +29,9 @@ export function prepareOptions<T>(
     body: options.body,
     headers: options.headers,
     method,
-    path: options.path,
     signal: options.signal,
     typeGuard: options.typeGuard,
+    url: options.url,
   };
 }
 

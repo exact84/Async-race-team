@@ -29,25 +29,25 @@ export class WinnersService {
   public create(body: Omit<WinnerRecord, 'id'>, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.post({
       body,
-      path: buildApiUrl(API_ENDPOINT.WINNERS),
       signal,
       typeGuard: isWinnerRecord,
+      url: buildApiUrl(API_ENDPOINT.WINNERS),
     });
   }
 
   public delete(id: number, signal?: AbortSignal): Promise<object> {
     return this.http.delete({
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
       signal,
       typeGuard: isEmptyObject,
+      url: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
     });
   }
 
   public get(id: number, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.get({
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
       signal,
       typeGuard: isWinnerRecord,
+      url: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
     });
   }
 
@@ -61,14 +61,14 @@ export class WinnersService {
     } = options;
 
     return this.http.get({
-      path: buildApiUrl(API_ENDPOINT.WINNERS, {
+      signal,
+      typeGuard: isWinnerRecordsArray,
+      url: buildApiUrl(API_ENDPOINT.WINNERS, {
         _limit: limit,
         _order: order,
         _page: page,
         _sort: sort,
       }),
-      signal,
-      typeGuard: isWinnerRecordsArray,
     });
   }
 
@@ -81,9 +81,9 @@ export class WinnersService {
   public update(record: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.put({
       body: record,
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(record.id), { id: record.id }),
       signal,
       typeGuard: isWinnerRecord,
+      url: buildApiUrl(API_ENDPOINT.WINNERS_ID(record.id), { id: record.id }),
     });
   }
 

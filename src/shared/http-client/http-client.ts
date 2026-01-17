@@ -57,7 +57,7 @@ export class HttpClient {
       signal: options.signal,
     };
 
-    return fetch(options.path, requestInit)
+    return fetch(options.url, requestInit)
       .then(checkResponse)
       .then(extractJson)
       .then(validateJson(options.typeGuard));

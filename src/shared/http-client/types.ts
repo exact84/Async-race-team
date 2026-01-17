@@ -5,9 +5,9 @@ export interface BaseRequestOptions<T> {
   body?: unknown;
   headers?: HeadersInit;
   method: HttpRequestMethod;
-  path: string;
   signal?: AbortSignal;
   typeGuard: TypeGuard<T>;
+  url: string;
 }
 
 export type HttpRequestMethod = (typeof HTTP_REQUEST_METHOD)[keyof typeof HTTP_REQUEST_METHOD];
