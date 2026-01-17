@@ -10,6 +10,21 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
+it('getView returns view', () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const controller = new CarController(view, engineService, garageService);
+
+  expect(controller.getView()).toBeInstanceOf(CarView);
+});
+
+it('passes callbacks to view', () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const setCallbacksSpy = vi.spyOn(view, 'setCallbacks');
+  new CarController(view, engineService, garageService);
+
+  expect(setCallbacksSpy).toBeCalled();
+});
+
 it('delete should call garageService.delete', async () => {
   const controller = new CarController(new CarView(MOCK_SINGLE_CAR), engineService, garageService);
   const spy = vi.spyOn(garageService, 'delete');
@@ -64,4 +79,82 @@ it('update should call garageService.update', async () => {
   await controller.update({ color: 'blue', name: 'new' });
 
   expect(updateSpy).toBeCalled();
+});
+
+it('drive recreates AbortController and aborts previous one', async () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const controller = new CarController(view, engineService, garageService);
+
+  const parentController = new AbortController();
+  const driveSpy = vi.spyOn(engineService, 'drive');
+
+  await controller.drive(parentController.signal);
+  await controller.drive(parentController.signal);
+
+  const expectedTimes = 2;
+  expect(driveSpy).toHaveBeenCalledTimes(expectedTimes);
+});
+
+it('parent abort signal aborts drive signal', async () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const controller = new CarController(view, engineService, garageService);
+
+  const parentController = new AbortController();
+  const drivePromise = controller.drive(parentController.signal);
+
+  parentController.abort();
+
+  await expect(drivePromise).rejects.toBeDefined();
+});
+
+it('startEngine sets drive metrics to view', async () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const controller = new CarController(view, engineService, garageService);
+
+  const setMetricsSpy = vi.spyOn(view, 'setDriveMetrics');
+  await controller.startEngine(view.getAbortSignal());
+
+  expect(setMetricsSpy).toBeCalled();
+});
+
+it('stop aborts active drive AbortController', async () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const controller = new CarController(view, engineService, garageService);
+
+  await controller.drive(view.getAbortSignal());
+
+  const toggleSpy = vi.spyOn(engineService, 'toggle');
+  toggleSpy.mockResolvedValue(MOCK_STOPPED_ENGINE_METRICS);
+
+  await controller.stop();
+
+  expect(toggleSpy).toBeCalledWith(MOCK_SINGLE_CAR.id, 'stopped', expect.any(AbortSignal));
+});
+
+it('delete passes abort signal when drive is active', async () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const controller = new CarController(view, engineService, garageService);
+
+  await controller.drive(view.getAbortSignal());
+
+  const deleteSpy = vi.spyOn(garageService, 'delete');
+  await controller.delete();
+
+  expect(deleteSpy).toBeCalledWith(MOCK_SINGLE_CAR.id, expect.any(AbortSignal));
+});
+
+it('update passes abort signal when drive is active', async () => {
+  const view = new CarView(MOCK_SINGLE_CAR);
+  const controller = new CarController(view, engineService, garageService);
+
+  await controller.drive(view.getAbortSignal());
+
+  const updateSpy = vi.spyOn(garageService, 'update');
+  await controller.update({ color: 'red', name: 'test' });
+
+  expect(updateSpy).toBeCalledWith(
+    MOCK_SINGLE_CAR.id,
+    { color: 'red', name: 'test' },
+    expect.any(AbortSignal)
+  );
 });
