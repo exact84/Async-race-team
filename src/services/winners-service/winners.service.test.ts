@@ -1,15 +1,42 @@
-import type { WinnerRecord } from './types';
+import { http, HttpResponse } from 'msw';
 
-import { MOCK_SINGLE_WINNER_RECORD, MOCK_WINNER_RECORDS_ARRAY } from '../../../__mocks__/data';
+import type { WinnerRecord, WinnerWithCarData } from './types';
+
+import { TEST_ENDPOINT } from '../../../__mocks__/constants';
+import {
+  MOCK_CARS_ARRAY,
+  MOCK_SINGLE_WINNER_RECORD,
+  MOCK_WINNER_RECORDS_ARRAY,
+} from '../../../__mocks__/data';
+import { server } from '../../../__mocks__/node';
+import { buildTestUrl } from '../../../__mocks__/test-utilities';
 import { serviceProvider } from '../service-provider';
 
 const winnersService = serviceProvider.winnersService();
 
+const MOCK_CARS_MAP = new Map(MOCK_CARS_ARRAY.map((car) => [car.id, car]));
+
+const MOCK_MAPPED_RECORDS: WinnerWithCarData[] = MOCK_WINNER_RECORDS_ARRAY.map((record) => {
+  const car = MOCK_CARS_MAP.get(record.id);
+
+  if (!car) {
+    throw new Error(`Car with id ${record.id.toString()} not found`);
+  }
+
+  return { color: car.color, id: record.id, name: car.name, time: record.time, wins: record.wins };
+});
+
 describe(winnersService.getAll.name, () => {
   it('returns winner records array', async () => {
+    server.use(
+      http.get(buildTestUrl(TEST_ENDPOINT.WINNERS), () => {
+        return HttpResponse.json(MOCK_MAPPED_RECORDS);
+      })
+    );
+
     const response = await winnersService.getAll();
 
-    expect(response).toEqual(MOCK_WINNER_RECORDS_ARRAY);
+    expect(response).toEqual(MOCK_MAPPED_RECORDS);
   });
 });
 

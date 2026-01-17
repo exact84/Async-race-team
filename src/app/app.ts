@@ -3,10 +3,11 @@ import { Router } from '@ripetchor/r-router';
 
 import { NAV_LINKS } from '../components/navbar/nav-links';
 import { Navbar } from '../components/navbar/navbar';
+import styles from './app.module.css';
 import { ROUTES } from './routes';
 
 export class App {
-  private root = div({ className: 'app' });
+  private root = div({ className: styles.app });
 
   private router = new Router(ROUTES);
 

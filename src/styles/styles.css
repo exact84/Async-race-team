@@ -5,6 +5,7 @@
   --color-green-dark: #1d8758;
   --color-rebeccapurple: rebeccapurple;
   --color-purple: #9575cd;
+  --transition-duration: 0.3s;
 
   color-scheme: light dark;
 }
@@ -53,7 +54,6 @@ html {
 html,
 body {
   min-height: 100%;
-  padding: 10px;
 }
 
 * {

@@ -19,6 +19,6 @@ export const serviceProvider = {
     );
   },
   winnersService(): WinnersService {
-    return WinnersService.getInstance(httpClient);
+    return WinnersService.getInstance(httpClient, serviceProvider.garageService());
   },
 } as const;

@@ -29,9 +29,9 @@ export class GarageService {
   public create(body: Omit<Car, 'id'>, signal?: AbortSignal): Promise<Car> {
     return this.http.post({
       body,
-      path: buildApiUrl(API_ENDPOINT.GARAGE),
       signal,
       typeGuard: isCar,
+      url: buildApiUrl(API_ENDPOINT.GARAGE),
     });
   }
 
@@ -46,17 +46,17 @@ export class GarageService {
 
   public delete(id: number, signal?: AbortSignal): Promise<object> {
     return this.http.delete({
-      path: buildApiUrl(API_ENDPOINT.GARAGE_ID(id), { id }),
       signal,
       typeGuard: isEmptyObject,
+      url: buildApiUrl(API_ENDPOINT.GARAGE_ID(id), { id }),
     });
   }
 
   public get(id: number, signal?: AbortSignal): Promise<Car> {
     return this.http.get({
-      path: buildApiUrl(API_ENDPOINT.GARAGE_ID(id), { id }),
       signal,
       typeGuard: isCar,
+      url: buildApiUrl(API_ENDPOINT.GARAGE_ID(id), { id }),
     });
   }
 
@@ -64,9 +64,9 @@ export class GarageService {
     const { limit = DEFAULT_LIMIT, page = DEFAULT_PAGE, signal } = options;
 
     return this.http.get({
-      path: buildApiUrl(API_ENDPOINT.GARAGE, { _limit: limit, _page: page }),
       signal,
       typeGuard: isCarsArray,
+      url: buildApiUrl(API_ENDPOINT.GARAGE, { _limit: limit, _page: page }),
     });
   }
 
@@ -79,9 +79,9 @@ export class GarageService {
   public update(id: number, body: Omit<Car, 'id'>, signal?: AbortSignal): Promise<Car> {
     return this.http.put({
       body: { color: body.color, id, name: body.name },
-      path: buildApiUrl(API_ENDPOINT.GARAGE_ID(id), { id }),
       signal,
       typeGuard: isCar,
+      url: buildApiUrl(API_ENDPOINT.GARAGE_ID(id), { id }),
     });
   }
 }

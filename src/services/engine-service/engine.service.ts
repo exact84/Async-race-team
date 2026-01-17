@@ -22,17 +22,17 @@ export class EngineService {
 
   public drive(id: number, signal?: AbortSignal): Promise<DriveResult> {
     return this.http.patch({
-      path: buildApiUrl(API_ENDPOINT.ENGINE, { id, status: 'drive' }),
       signal,
       typeGuard: isDriveResult,
+      url: buildApiUrl(API_ENDPOINT.ENGINE, { id, status: 'drive' }),
     });
   }
 
   public toggle(id: number, status: EngineStatus, signal?: AbortSignal): Promise<DriveMetrics> {
     return this.http.patch({
-      path: buildApiUrl(API_ENDPOINT.ENGINE, { id, status }),
       signal,
       typeGuard: isDriveMetrics,
+      url: buildApiUrl(API_ENDPOINT.ENGINE, { id, status }),
     });
   }
 }

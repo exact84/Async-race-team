@@ -1,5 +1,6 @@
 import type { HttpClient } from '../../shared/http-client/http-client';
-import type { GetAllOptions, WinnerRecord } from './types';
+import type { GarageService } from '../garage-service/garage.service';
+import type { GetAllOptions, WinnerRecord, WinnerWithCarData } from './types';
 
 import { isEmptyObject } from '../../shared/type-guards';
 import { API_ENDPOINT } from '../constants';
@@ -14,14 +15,17 @@ const DEFAULT_SORT_ORDER = 'ASC';
 export class WinnersService {
   private static instance: null | WinnersService = null;
 
+  private readonly garageService;
+
   private http: HttpClient;
 
-  private constructor(http: HttpClient) {
+  private constructor(http: HttpClient, garageService: GarageService) {
     this.http = http;
+    this.garageService = garageService;
   }
 
-  public static getInstance(http: HttpClient): WinnersService {
-    this.instance ??= new WinnersService(http);
+  public static getInstance(http: HttpClient, garageService: GarageService): WinnersService {
+    this.instance ??= new WinnersService(http, garageService);
 
     return this.instance;
   }
@@ -29,29 +33,29 @@ export class WinnersService {
   public create(body: Omit<WinnerRecord, 'id'>, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.post({
       body,
-      path: buildApiUrl(API_ENDPOINT.WINNERS),
       signal,
       typeGuard: isWinnerRecord,
+      url: buildApiUrl(API_ENDPOINT.WINNERS),
     });
   }
 
   public delete(id: number, signal?: AbortSignal): Promise<object> {
     return this.http.delete({
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
       signal,
       typeGuard: isEmptyObject,
+      url: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
     });
   }
 
   public get(id: number, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.get({
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
       signal,
       typeGuard: isWinnerRecord,
+      url: buildApiUrl(API_ENDPOINT.WINNERS_ID(id), { id }),
     });
   }
 
-  public getAll(options: GetAllOptions = {}): Promise<WinnerRecord[]> {
+  public getAll(options: GetAllOptions = {}): Promise<WinnerWithCarData[]> {
     const {
       limit = DEFAULT_LIMIT,
       order = DEFAULT_SORT_ORDER,
@@ -60,15 +64,27 @@ export class WinnersService {
       sort = DEFAULT_SORT_FIELD,
     } = options;
 
-    return this.http.get({
-      path: buildApiUrl(API_ENDPOINT.WINNERS, {
-        _limit: limit,
-        _order: order,
-        _page: page,
-        _sort: sort,
-      }),
-      signal,
-      typeGuard: isWinnerRecordsArray,
+    const url = buildApiUrl(API_ENDPOINT.WINNERS, {
+      _limit: limit,
+      _order: order,
+      _page: page,
+      _sort: sort,
+    });
+
+    return this.http.get({ signal, typeGuard: isWinnerRecordsArray, url }).then((records) => {
+      return Promise.all(
+        records.map((record) => {
+          return this.garageService
+            .get(record.id)
+            .then((car) => ({
+              color: car.color,
+              id: record.id,
+              name: car.name,
+              time: record.time,
+              wins: record.wins,
+            }));
+        })
+      );
     });
   }
 
@@ -81,9 +97,9 @@ export class WinnersService {
   public update(record: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.put({
       body: record,
-      path: buildApiUrl(API_ENDPOINT.WINNERS_ID(record.id), { id: record.id }),
       signal,
       typeGuard: isWinnerRecord,
+      url: buildApiUrl(API_ENDPOINT.WINNERS_ID(record.id), { id: record.id }),
     });
   }
 

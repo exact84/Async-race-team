@@ -73,9 +73,9 @@ describe(prepareOptions.name, () => {
     const options: Omit<BaseRequestOptions<string>, 'method'> = {
       body: 'data',
       headers: { A: '1' },
-      path: '/test',
       signal: undefined,
       typeGuard: passGuard,
+      url: '/test',
     };
 
     const result = prepareOptions('POST', options);
@@ -84,9 +84,9 @@ describe(prepareOptions.name, () => {
       body: 'data',
       headers: { A: '1' },
       method: 'POST',
-      path: '/test',
       signal: undefined,
       typeGuard: passGuard,
+      url: '/test',
     });
   });
 });
