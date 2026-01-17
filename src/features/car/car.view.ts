@@ -10,7 +10,7 @@ import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
 import styles from './car.view.module.css';
 
-interface CarViewCallbacks {
+export interface CarViewCallbacks {
   onDelete(): Promise<object>;
   onDrive(signal: AbortSignal): Promise<DriveResult>;
   onStop(): Promise<DriveMetrics>;
@@ -27,13 +27,25 @@ export class CarView extends Component<Car, State> {
 
   private animation: Animation | null = null;
 
-  private buttonDelete = new Button({ buttonSize: 'sm', textContent: 'Delete' });
+  private buttonDelete = new Button({
+    buttonSize: 'sm',
+    testid: 'button-delete',
+    textContent: 'Delete',
+  });
 
-  private buttonStart = new Button({ buttonSize: 'sm', textContent: 'Start' });
+  private buttonStart = new Button({
+    buttonSize: 'sm',
+    testid: 'button-start',
+    textContent: 'Start',
+  });
 
-  private buttonStop = new Button({ buttonSize: 'sm', textContent: 'Stop' });
+  private buttonStop = new Button({ buttonSize: 'sm', testid: 'button-stop', textContent: 'Stop' });
 
-  private buttonUpdate = new Button({ buttonSize: 'sm', textContent: 'Update' });
+  private buttonUpdate = new Button({
+    buttonSize: 'sm',
+    testid: 'button-update',
+    textContent: 'Update',
+  });
 
   private callbacks: CarViewCallbacks | null = null;
 

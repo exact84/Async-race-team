@@ -7,6 +7,7 @@ export interface ButtonProperties {
   buttonSize?: ButtonSize;
   onClick?(): void;
   onToggle?(): void;
+  testid?: string;
   textContent: string;
 }
 
@@ -17,12 +18,13 @@ export class Button extends Component<ButtonProperties> {
 
   private buttonElement = button(
     {
-      className: this.props.buttonSize
+      'className': this.props.buttonSize
         ? styles.button + ' ' + styles[`button-${this.props.buttonSize}`]
         : styles.button,
-      click: () => this.props.onClick?.(),
-      signal: this.abortController.signal,
-      toggle: () => this.props.onToggle?.(),
+      'click': () => this.props.onClick?.(),
+      'data-testid': this.props.testid,
+      'signal': this.abortController.signal,
+      'toggle': () => this.props.onToggle?.(),
     },
     this.props.textContent
   );
