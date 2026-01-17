@@ -1,1 +1,4 @@
-export default { extends: ['stylelint-config-clean-order', 'stylelint-config-standard'] };
+export default {
+  extends: ['stylelint-config-clean-order', 'stylelint-config-standard'],
+  rules: { 'selector-class-pattern': null },
+};

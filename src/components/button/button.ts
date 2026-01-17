@@ -1,4 +1,4 @@
-import { div } from '@ripetchor/dom';
+import { button } from '@ripetchor/dom';
 
 import { Component, defineElement } from '../../shared/component/component';
 import styles from './button.module.css';
@@ -15,7 +15,7 @@ export type ButtonSize = 'lg' | 'md' | 'sm';
 export class Button extends Component<ButtonProperties> {
   private abortController = new AbortController();
 
-  private buttonElement = div(
+  private buttonElement = button(
     {
       className: this.props.buttonSize
         ? styles.button + ' ' + styles[`button-${this.props.buttonSize}`]
@@ -37,6 +37,14 @@ export class Button extends Component<ButtonProperties> {
 
   public render(): HTMLElement {
     return this.buttonElement;
+  }
+
+  public toggleDisabled(disabled: boolean): void {
+    if (disabled) {
+      this.buttonElement.setAttribute('disabled', '');
+    } else {
+      this.buttonElement.removeAttribute('disabled');
+    }
   }
 }
 
