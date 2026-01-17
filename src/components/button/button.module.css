@@ -1,12 +1,16 @@
 .button {
   cursor: pointer;
   user-select: none;
+
   width: fit-content;
   padding: 0.5em 1em;
   border: none;
   border-radius: 4px;
+
   color: var(--bg-color);
+
   background-color: var(--accent-color);
+
   transition:
     background-color 0.3s ease-in-out,
     color 0.3s ease-in-out;
