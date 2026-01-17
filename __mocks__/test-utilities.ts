@@ -21,6 +21,14 @@ export function buildTestUrl(
   return finalUrl;
 }
 
+export function render<T extends HTMLElement>(createComponent: () => T): T {
+  const component = createComponent();
+
+  document.body.append(component);
+
+  return component;
+}
+
 export function testTypeGuard<T>(result: boolean) {
   return function (v: unknown): v is T {
     void v;

@@ -1,0 +1,9 @@
+.container {
+  display: grid;
+  gap: 5px;
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 5px;
+}

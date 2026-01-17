@@ -23,13 +23,9 @@ export abstract class Component<
     return this.props;
   }
 
-  public abstract render(): HTMLElement;
+  public abstract render(): DocumentFragment | HTMLElement;
 
-  protected connectedCallback(): void {
-    this.update();
-  }
-
-  protected setState(nextState: ((previous: S) => Partial<S>) | Partial<S>): void {
+  public setState(nextState: ((previous: S) => Partial<S>) | Partial<S>): void {
     const updateFunction =
       typeof nextState === 'function'
         ? nextState
@@ -44,6 +40,10 @@ export abstract class Component<
         this.flush();
       });
     }
+  }
+
+  protected connectedCallback(): void {
+    this.update();
   }
 
   private flush(): void {
