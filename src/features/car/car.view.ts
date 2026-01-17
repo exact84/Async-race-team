@@ -7,7 +7,7 @@ import { Button } from '../../components/button/button';
 import { CarImage } from '../../components/car-image/car-image';
 import { createRandomCar } from '../../services/garage-service/utilities';
 import { Component, defineElement } from '../../shared/component/component';
-import { fragment } from '../../shared/utilities';
+import { createFragment } from '../../shared/utilities';
 import styles from './car.view.module.css';
 
 interface CarViewCallbacks {
@@ -99,7 +99,7 @@ export class CarView extends Component<Car, State> {
   public render(): DocumentFragment {
     this.carImage = new CarImage({ color: this.state.color });
 
-    return fragment(
+    return createFragment(
       div(null, this.state.name),
       this.carImage,
       div(

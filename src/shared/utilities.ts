@@ -1,6 +1,6 @@
 const STRING_LENGTH = 6;
 
-export function fragment(...elements: HTMLElement[]): DocumentFragment {
+export function createFragment(...elements: HTMLElement[]): DocumentFragment {
   const documentFragment = document.createDocumentFragment();
 
   documentFragment.append(...elements);
