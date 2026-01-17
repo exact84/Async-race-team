@@ -1,0 +1,11 @@
+.app {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 20px;
+}
+
+@media (width <= 768px) {
+  .app {
+    padding: 10px;
+  }
+}
