@@ -34,17 +34,15 @@ it('delete should call garageService.delete', async () => {
   expect(spy).toBeCalled();
 });
 
-it('startEngine should call engineService.toggle and view.drive', async () => {
+it('startEngine should call engineService.toggle', async () => {
   const view = new CarView(MOCK_SINGLE_CAR);
   const controller = new CarController(view, engineService, garageService);
 
   const toggleSpy = vi.spyOn(engineService, 'toggle');
-  const driveSpy = vi.spyOn(view, 'drive');
 
   await controller.startEngine(view.getAbortSignal());
 
   expect(toggleSpy).toBeCalledWith(MOCK_SINGLE_CAR.id, 'started', expect.any(AbortSignal));
-  expect(driveSpy).toBeCalled();
 });
 
 it('drive should call startEngine and engineService.drive', async () => {

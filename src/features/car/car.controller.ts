@@ -24,7 +24,7 @@ export class CarController {
 
     this.view.setCallbacks({
       onDelete: () => this.delete(),
-      onDrive: (signal) => this.drive(signal),
+      onDrive: (signal) => this.startAndDrive(signal),
       onStop: () => this.stop(),
       onUpdate: (data) => this.update(data),
     });
@@ -37,17 +37,30 @@ export class CarController {
   public drive(parentSignal: AbortSignal): Promise<DriveResult> {
     const signal = this.recreateDriveAbortController(parentSignal);
 
-    return this.startEngine(signal).then(() => this.engineService.drive(this.carId, signal));
+    return this.engineService.drive(this.carId, signal);
   }
 
   public getView(): HTMLElement {
     return this.view;
   }
 
+  public startAndDrive(parentSignal: AbortSignal): Promise<DriveResult> {
+    const signal = this.recreateDriveAbortController(parentSignal);
+
+    return this.startEngine(signal).then(() => {
+      this.startAnimation();
+
+      return this.engineService.drive(this.carId, signal);
+    });
+  }
+
+  public startAnimation(): void {
+    this.view.drive();
+  }
+
   public startEngine(signal: AbortSignal): Promise<DriveMetrics> {
     return this.engineService.toggle(this.carId, 'started', signal).then((metrics) => {
       this.view.setDriveMetrics(metrics);
-      this.view.drive();
       return metrics;
     });
   }
