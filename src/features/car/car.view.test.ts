@@ -144,11 +144,11 @@ it('should toggle all buttons combinations in setButtonsState', () => {
   expect(buttonUpdate).not.toBeDisabled();
 });
 
-it('onStartButtonClick should call pause on error', async () => {
+it('onStartButtonClick should call pauseAnimation on error', async () => {
   const user = userEvent.setup();
   const view = render(() => new CarView(MOCK_SINGLE_CAR));
 
-  const pauseSpy = vi.spyOn(view, 'pause');
+  const pauseSpy = vi.spyOn(view, 'pauseAnimation');
 
   view.setCallbacks({ ...mockCallbacks, onDrive: vi.fn().mockRejectedValue(new Error('fff')) });
 
