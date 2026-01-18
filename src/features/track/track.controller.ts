@@ -16,6 +16,10 @@ export class TrackController {
 
   private readonly garageService: GarageService;
 
+  private readonly startedEngines = new Set<number>();
+
+  private trackAbortController: AbortController | null = null;
+
   private readonly view: TrackView;
 
   private readonly winnersService: WinnersService;
@@ -51,7 +55,11 @@ export class TrackController {
   }
 
   public async startRace(): Promise<void> {
-    const signal = new AbortController().signal;
+    this.trackAbortController?.abort();
+    this.trackAbortController = new AbortController();
+
+    const signal = this.trackAbortController.signal;
+
     await this.startAllEngines(signal);
 
     const start = Date.now();
@@ -83,9 +91,33 @@ export class TrackController {
     console.warn('RACE ENDED');
   }
 
+  public async stopRace(): Promise<void> {
+    if (!this.trackAbortController) {
+      return;
+    }
+
+    this.trackAbortController.abort();
+    this.trackAbortController = null;
+
+    const stopPromises = Array.from(this.startedEngines, (id) =>
+      this.engineService.toggle(id, 'stopped')
+    );
+
+    await Promise.all(stopPromises);
+
+    this.startedEngines.clear();
+
+    for (const controller of this.carControllers) {
+      controller.stopAnimation();
+    }
+
+    console.warn('RACE STOPPED');
+  }
+
   private async startAllEngines(signal: AbortSignal): Promise<void> {
     await Promise.all(
       this.carControllers.map((c) => {
+        this.startedEngines.add(c.getCarId());
         c.disableButtons();
         return c.startEngine(signal);
       })

@@ -1,10 +1,11 @@
 import 'modern-normalize/modern-normalize.css';
+import { button } from '@ripetchor/dom';
 
 import { App } from './app/app';
 import { TrackController } from './features/track/track.controller';
 import { TrackView } from './features/track/track.view';
-import { serviceProvider } from './services/service-provider';
 import './styles/styles.css';
+import { serviceProvider } from './services/service-provider';
 
 const app = new App();
 
@@ -21,13 +22,22 @@ const trackController = new TrackController(
   winnersService
 );
 
-const TIMEOUT = 2000;
+const stopRaceButton = button(
+  {
+    click: () => {
+      trackController.stopRace().catch(console.warn);
+    },
+  },
+  'Stop race'
+);
 
-document.body.append(trackController.getView());
+const startRaceButton = button(
+  {
+    click: () => {
+      trackController.startRace().catch(console.warn);
+    },
+  },
+  'Start race'
+);
 
-setTimeout(() => {
-  trackController
-    .startRace()
-    .then(() => winnersService.getAll())
-    .then(console.warn, console.warn);
-}, TIMEOUT);
+document.body.append(trackController.getView(), startRaceButton, stopRaceButton);

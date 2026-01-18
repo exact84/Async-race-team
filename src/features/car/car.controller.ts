@@ -46,6 +46,10 @@ export class CarController {
       .then((result) => ({ ...this.view.getProps(), success: result.success }));
   }
 
+  public getCarId(): number {
+    return this.carId;
+  }
+
   public getView(): HTMLElement {
     return this.view;
   }
