@@ -90,6 +90,7 @@ export class TrackController {
 
     for (const controller of this.carControllers) {
       controller.stopAnimation();
+      controller.enableButtons();
     }
   }
 

@@ -46,6 +46,10 @@ export class CarController {
       .then((result) => ({ ...this.view.getProps(), success: result.success }));
   }
 
+  public enableButtons(): void {
+    this.view.setButtonsState({ delete: false, start: false, stop: true, update: false });
+  }
+
   public getCarId(): number {
     return this.carId;
   }
