@@ -34,10 +34,16 @@ export class CarController {
     return this.garageService.delete(this.carId, this.driveAbortController?.signal);
   }
 
-  public drive(parentSignal: AbortSignal): Promise<DriveResult> {
+  public disableButtons(): void {
+    this.view.setButtonsState({ delete: true, start: true, stop: true, update: true });
+  }
+
+  public drive(parentSignal: AbortSignal): Promise<Car & { success: boolean }> {
     const signal = this.recreateDriveAbortController(parentSignal);
 
-    return this.engineService.drive(this.carId, signal);
+    return this.engineService
+      .drive(this.carId, signal)
+      .then((result) => ({ ...this.view.getProps(), success: result.success }));
   }
 
   public getView(): HTMLElement {

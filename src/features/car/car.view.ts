@@ -93,6 +93,20 @@ export class CarView extends Component<Car, State> {
     );
   }
 
+  public setButtonsState(options: {
+    delete?: boolean;
+    start?: boolean;
+    stop?: boolean;
+    update?: boolean;
+  }): void {
+    const defaultValue = false;
+
+    this.buttonDelete.toggleDisabled(options.delete ?? defaultValue);
+    this.buttonStart.toggleDisabled(options.start ?? defaultValue);
+    this.buttonStop.toggleDisabled(options.stop ?? defaultValue);
+    this.buttonUpdate.toggleDisabled(options.update ?? defaultValue);
+  }
+
   public setCallbacks(callbacks: CarViewCallbacks): void {
     this.callbacks = callbacks;
   }
@@ -236,20 +250,6 @@ export class CarView extends Component<Car, State> {
     } finally {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
-  }
-
-  private setButtonsState(options: {
-    delete?: boolean;
-    start?: boolean;
-    stop?: boolean;
-    update?: boolean;
-  }): void {
-    const defaultValue = false;
-
-    this.buttonDelete.toggleDisabled(options.delete ?? defaultValue);
-    this.buttonStart.toggleDisabled(options.start ?? defaultValue);
-    this.buttonStop.toggleDisabled(options.stop ?? defaultValue);
-    this.buttonUpdate.toggleDisabled(options.update ?? defaultValue);
   }
 }
 
