@@ -22,6 +22,8 @@ interface State {
   name: string;
 }
 
+const CROSS_LINE_WIDTH = 20;
+
 export class CarView extends Component<Car, State> {
   private readonly abortController = new AbortController();
 
@@ -70,7 +72,7 @@ export class CarView extends Component<Car, State> {
       return;
     }
 
-    const endWidth = this.clientWidth - this.carImage.clientWidth;
+    const endWidth = this.clientWidth - this.carImage.clientWidth - CROSS_LINE_WIDTH;
 
     const duration = this.driveMetrics.distance / this.driveMetrics.velocity;
 
