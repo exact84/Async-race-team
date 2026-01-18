@@ -25,7 +25,7 @@ interface State {
 const CROSS_LINE_WIDTH = 20;
 
 export class CarView extends Component<Car, State> {
-  private readonly abortController = new AbortController();
+  private abortController: AbortController | null = null;
 
   private animation: Animation | null = null;
 
@@ -63,11 +63,11 @@ export class CarView extends Component<Car, State> {
     this.className = styles.container;
 
     this.setButtonsState({ delete: false, start: false, stop: true, update: false });
-
-    this.initializeButtonListeners();
   }
 
   public getAbortSignal(): AbortSignal {
+    this.abortController ??= new AbortController();
+
     return this.abortController.signal;
   }
 
@@ -78,6 +78,13 @@ export class CarView extends Component<Car, State> {
   }
 
   public render(): DocumentFragment {
+    this.abortController?.abort();
+    this.abortController = null;
+
+    this.abortController = new AbortController();
+
+    this.initializeButtonListeners();
+
     this.carImage = new CarImage({ color: this.state.color });
 
     return createFragment(
@@ -162,7 +169,8 @@ export class CarView extends Component<Car, State> {
   }
 
   protected disconnectedCallback(): void {
-    this.abortController.abort();
+    this.abortController?.abort();
+    this.abortController = null;
   }
 
   private initializeButtonListeners(): void {
