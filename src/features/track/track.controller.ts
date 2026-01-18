@@ -60,31 +60,24 @@ export class TrackController {
 
     const start = Date.now();
 
-    const drivePromises = this.carControllers.map((c) =>
-      c
+    const drivePromises = this.carControllers.map((controller) =>
+      controller
         .drive(signal)
         .then((result) => ({ ...result, time: getElapsedSeconds(start) }))
         .catch(() => {
-          c.pauseAnimation();
-          throw new Error('crashed');
+          controller.pauseAnimation();
+
+          throw new Error('Car crashed');
         })
     );
 
     const winner = await Promise.any(drivePromises).catch(() => null);
 
     if (winner) {
-      console.warn('Winner in race:', winner);
-      const savedWinner = await this.winnersService.upsert(winner.id, {
-        time: winner.time,
-        wins: 1,
-      });
-      console.warn('Winner saved in DB:', savedWinner);
-    } else {
-      console.warn('ALL CARS CRASHED');
+      await this.winnersService.upsert(winner.id, { time: winner.time, wins: 1 });
     }
 
     await Promise.allSettled(drivePromises);
-    console.warn('RACE ENDED');
   }
 
   public async stopRace(): Promise<void> {
@@ -106,16 +99,15 @@ export class TrackController {
     for (const controller of this.carControllers) {
       controller.stopAnimation();
     }
-
-    console.warn('RACE STOPPED');
   }
 
   private async startAllEngines(signal: AbortSignal): Promise<void> {
     await Promise.all(
-      this.carControllers.map((c) => {
-        this.startedEngines.add(c.getCarId());
-        c.disableButtons();
-        return c.startEngine(signal);
+      this.carControllers.map((controller) => {
+        this.startedEngines.add(controller.getCarId());
+        controller.disableButtons();
+
+        return controller.startEngine(signal);
       })
     );
 
@@ -127,5 +119,6 @@ export class TrackController {
 
 function getElapsedSeconds(startTime: number): number {
   const elapsedMs = Date.now() - startTime;
-  return Number.parseFloat((elapsedMs / MILLISECONDS_IN_SECONDS).toFixed(FRACTION_DIGITS));
+
+  return Number((elapsedMs / MILLISECONDS_IN_SECONDS).toFixed(FRACTION_DIGITS));
 }
