@@ -123,7 +123,7 @@ it('should handle drive without driveMetrics', () => {
   const view = render(() => new CarView(MOCK_SINGLE_CAR));
 
   expect(() => {
-    view.drive();
+    view.startAnimation();
   }).not.toThrow();
 });
 

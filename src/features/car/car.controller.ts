@@ -44,6 +44,10 @@ export class CarController {
     return this.view;
   }
 
+  public pauseAnimation(): void {
+    this.view.pauseAnimation();
+  }
+
   public startAndDrive(parentSignal: AbortSignal): Promise<DriveResult> {
     const signal = this.recreateDriveAbortController(parentSignal);
 
@@ -55,7 +59,7 @@ export class CarController {
   }
 
   public startAnimation(): void {
-    this.view.drive();
+    this.view.startAnimation();
   }
 
   public startEngine(signal: AbortSignal): Promise<DriveMetrics> {
@@ -82,6 +86,10 @@ export class CarController {
     );
 
     return this.engineService.toggle(this.carId, 'stopped', stopController.signal);
+  }
+
+  public stopAnimation(): void {
+    this.view.stopAnimation();
   }
 
   public update(data: Omit<Car, 'id'>): Promise<Car> {

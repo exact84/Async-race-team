@@ -67,7 +67,41 @@ export class CarView extends Component<Car, State> {
     this.initializeButtonListeners();
   }
 
-  public drive(): void {
+  public getAbortSignal(): AbortSignal {
+    return this.abortController.signal;
+  }
+
+  public pauseAnimation(): void {
+    if (this.animation) {
+      this.animation.pause();
+    }
+  }
+
+  public render(): DocumentFragment {
+    this.carImage = new CarImage({ color: this.state.color });
+
+    return createFragment(
+      div(null, this.state.name),
+      this.carImage,
+      div(
+        { className: styles.buttonsContainer },
+        this.buttonStart,
+        this.buttonStop,
+        this.buttonUpdate,
+        this.buttonDelete
+      )
+    );
+  }
+
+  public setCallbacks(callbacks: CarViewCallbacks): void {
+    this.callbacks = callbacks;
+  }
+
+  public setDriveMetrics(driveMetrics: DriveMetrics): void {
+    this.driveMetrics = driveMetrics;
+  }
+
+  public startAnimation(): void {
     if (!this.carImage || !this.driveMetrics) {
       return;
     }
@@ -100,41 +134,7 @@ export class CarView extends Component<Car, State> {
     );
   }
 
-  public getAbortSignal(): AbortSignal {
-    return this.abortController.signal;
-  }
-
-  public pause(): void {
-    if (this.animation) {
-      this.animation.pause();
-    }
-  }
-
-  public render(): DocumentFragment {
-    this.carImage = new CarImage({ color: this.state.color });
-
-    return createFragment(
-      div(null, this.state.name),
-      this.carImage,
-      div(
-        { className: styles.buttonsContainer },
-        this.buttonStart,
-        this.buttonStop,
-        this.buttonUpdate,
-        this.buttonDelete
-      )
-    );
-  }
-
-  public setCallbacks(callbacks: CarViewCallbacks): void {
-    this.callbacks = callbacks;
-  }
-
-  public setDriveMetrics(driveMetrics: DriveMetrics): void {
-    this.driveMetrics = driveMetrics;
-  }
-
-  public stop(): void {
+  public stopAnimation(): void {
     if (!this.carImage) {
       return;
     }
@@ -203,7 +203,7 @@ export class CarView extends Component<Car, State> {
     try {
       await this.callbacks?.onDrive(this.getAbortSignal());
     } catch {
-      this.pause();
+      this.pauseAnimation();
     } finally {
       this.setButtonsState({ delete: true, start: true, stop: false, update: true });
     }
@@ -215,7 +215,7 @@ export class CarView extends Component<Car, State> {
     try {
       await this.callbacks?.onStop();
 
-      this.stop();
+      this.stopAnimation();
     } finally {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
