@@ -1,5 +1,6 @@
 import type { EngineService } from '../../services/engine-service/engine.service';
 import type { GarageService } from '../../services/garage-service/garage.service';
+import type { Car } from '../../services/garage-service/types';
 import type { WinnersService } from '../../services/winners-service/winners.service';
 import type { TrackView } from './track.view';
 
@@ -58,18 +59,9 @@ export class TrackController {
 
     await this.startAllEngines(signal);
 
-    const start = Date.now();
+    const startTime = Date.now();
 
-    const drivePromises = this.carControllers.map((controller) =>
-      controller
-        .drive(signal)
-        .then((result) => ({ ...result, time: getElapsedSeconds(start) }))
-        .catch(() => {
-          controller.pauseAnimation();
-
-          throw new Error('Car crashed');
-        })
-    );
+    const drivePromises = this.driveAllCars(startTime, signal);
 
     const winner = await Promise.any(drivePromises).catch(() => null);
 
@@ -99,6 +91,22 @@ export class TrackController {
     for (const controller of this.carControllers) {
       controller.stopAnimation();
     }
+  }
+
+  private driveAllCars(
+    startTime: number,
+    signal: AbortSignal
+  ): Promise<Car & { success: boolean; time: number }>[] {
+    return this.carControllers.map((controller) =>
+      controller
+        .drive(signal)
+        .then((result) => ({ ...result, time: getElapsedSeconds(startTime) }))
+        .catch(() => {
+          controller.pauseAnimation();
+
+          throw new Error('Car crashed');
+        })
+    );
   }
 
   private async startAllEngines(signal: AbortSignal): Promise<void> {
