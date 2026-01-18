@@ -34,8 +34,6 @@ export class TrackController {
     this.engineService = engineService;
     this.garageService = garageService;
     this.winnersService = winnersService;
-
-    this.initialize().then(console.warn, console.warn);
   }
 
   public getView(): HTMLElement {
@@ -48,8 +46,6 @@ export class TrackController {
     this.carControllers = cars.map(
       (car) => new CarController(new CarView(car), this.engineService, this.garageService)
     );
-
-    console.warn(this.carControllers);
 
     this.view.setState({ carControllers: this.carControllers });
   }
