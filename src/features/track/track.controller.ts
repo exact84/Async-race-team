@@ -1,4 +1,5 @@
 import type { EngineService } from '../../services/engine-service/engine.service';
+import type { DriveMetrics } from '../../services/engine-service/types';
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
 import type { WinnersService } from '../../services/winners-service/winners.service';
@@ -56,6 +57,8 @@ export class TrackController {
     this.trackAbortController = new AbortController();
 
     const signal = this.trackAbortController.signal;
+
+    await this.stopAllCars();
 
     await this.startAllEngines(signal);
 
@@ -123,6 +126,14 @@ export class TrackController {
     for (const controller of this.carControllers) {
       controller.startAnimation();
     }
+  }
+
+  private stopAllCars(): Promise<(DriveMetrics | null)[]> {
+    const stopPromises = this.carControllers.map((controller) => {
+      return controller.stop().catch(() => null);
+    });
+
+    return Promise.all(stopPromises);
   }
 }
 
