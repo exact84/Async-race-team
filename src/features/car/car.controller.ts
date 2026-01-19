@@ -4,6 +4,8 @@ import type { GarageService } from '../../services/garage-service/garage.service
 import type { Car } from '../../services/garage-service/types';
 import type { CarView } from './car.view';
 
+type SingleStartCallback = (id: number) => void;
+
 export class CarController {
   private readonly carId: number;
 
@@ -12,6 +14,8 @@ export class CarController {
   private readonly engineService: EngineService;
 
   private readonly garageService: GarageService;
+
+  private onSingleStart: null | SingleStartCallback = null;
 
   private readonly view: CarView;
 
@@ -62,8 +66,14 @@ export class CarController {
     this.view.pauseAnimation();
   }
 
+  public setOnSingleStart(callback: SingleStartCallback): void {
+    this.onSingleStart = callback;
+  }
+
   public startAndDrive(parentSignal: AbortSignal): Promise<DriveResult> {
     const signal = this.recreateDriveAbortController(parentSignal);
+
+    this.onSingleStart?.(this.carId);
 
     return this.startEngine(signal).then(() => {
       this.startAnimation();

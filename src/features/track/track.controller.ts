@@ -1,6 +1,5 @@
 import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { EngineService } from '../../services/engine-service/engine.service';
-// import type { DriveMetrics } from '../../services/engine-service/types';
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
 import type { WinnersService } from '../../services/winners-service/winners.service';
@@ -21,6 +20,8 @@ export class TrackController {
   private readonly engineService: EngineService;
 
   private readonly garageService: GarageService;
+
+  private readonly singleStartedEngines = new Set<number>();
 
   private startAbortController: AbortController | null = null;
 
@@ -68,9 +69,19 @@ export class TrackController {
 
     const cars = await this.garageService.getAll();
 
-    this.carControllers = cars.map(
-      (car) => new CarController(new CarView(car), this.engineService, this.garageService)
-    );
+    this.carControllers = cars.map((car) => {
+      const controller = new CarController(
+        new CarView(car),
+        this.engineService,
+        this.garageService
+      );
+
+      controller.setOnSingleStart((id) => {
+        this.singleStartedEngines.add(id);
+      });
+
+      return controller;
+    });
 
     this.view.setState({ carControllers: this.carControllers });
   }
@@ -82,7 +93,8 @@ export class TrackController {
     this.startAbortController = this.recreateAbortcontroller(this.startAbortController);
     const startSignal = this.startAbortController.signal;
 
-    // await this.stopAllCars();
+    await this.stopRunningCars();
+
     await this.startAllEngines(startSignal);
 
     const startTime = Date.now();
@@ -175,13 +187,19 @@ export class TrackController {
     }
   }
 
-  // private stopAllCars(): Promise<(DriveMetrics | null)[]> {
-  //   const stopPromises = this.carControllers.map((controller) => {
-  //     return controller.stop().catch(() => null);
-  //   });
+  private async stopRunningCars(): Promise<void> {
+    if (this.singleStartedEngines.size === 0) {
+      return;
+    }
 
-  //   return Promise.all(stopPromises);
-  // }
+    const stopPromises = this.carControllers
+      .filter((c) => this.singleStartedEngines.has(c.getCarId()))
+      .map((controller) => controller.stop().catch(() => null));
+
+    await Promise.all(stopPromises);
+
+    this.singleStartedEngines.clear();
+  }
 }
 
 function getElapsedSeconds(startTime: number): number {
