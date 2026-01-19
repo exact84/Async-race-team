@@ -94,6 +94,8 @@ export class TrackController {
     }
 
     await Promise.allSettled(drivePromises);
+
+    this.emitter?.emit('race:completed');
   }
 
   public async stopRace(): Promise<void> {
@@ -140,6 +142,10 @@ export class TrackController {
     }
 
     const unusbscribeStartRace = this.emitter.on('race:start', () => {
+      for (const controller of this.carControllers) {
+        controller.disableButtons();
+      }
+
       this.startRace().catch(console.warn);
     });
 
@@ -154,7 +160,6 @@ export class TrackController {
     await Promise.all(
       this.carControllers.map((controller) => {
         this.startedEngines.add(controller.getCarId());
-        controller.disableButtons();
 
         return controller.startEngine(signal);
       })

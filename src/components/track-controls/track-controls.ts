@@ -27,6 +27,8 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   private readonly buttonStart = new Button({
     onClick: (): void => {
+      this.setButtonsState({ createHundred: true, createOne: true, start: true, stop: false });
+
       this.props.emitter.emit('race:start');
     },
     textContent: 'Start race',
@@ -34,6 +36,8 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   private readonly buttonStop = new Button({
     onClick: (): void => {
+      this.setButtonsState({ createHundred: false, createOne: false, start: false, stop: true });
+
       this.props.emitter.emit('race:stop');
     },
     textContent: 'Stop race',
@@ -43,6 +47,8 @@ export class TrackControls extends Component<TrackControlProperties> {
     super(properties);
 
     this.className = styles.container;
+
+    this.setButtonsState({ createHundred: false, createOne: false, start: false, stop: true });
   }
 
   public render(): DocumentFragment | HTMLElement {
@@ -52,6 +58,20 @@ export class TrackControls extends Component<TrackControlProperties> {
       this.buttonCreateOne,
       this.buttonCreateHundred
     );
+  }
+
+  private setButtonsState(options: {
+    createHundred?: boolean;
+    createOne?: boolean;
+    start?: boolean;
+    stop?: boolean;
+  }): void {
+    const defaultValue = false;
+
+    this.buttonStart.toggleDisabled(options.start ?? defaultValue);
+    this.buttonStop.toggleDisabled(options.stop ?? defaultValue);
+    this.buttonCreateOne.toggleDisabled(options.createOne ?? defaultValue);
+    this.buttonCreateHundred.toggleDisabled(options.createHundred ?? defaultValue);
   }
 }
 
