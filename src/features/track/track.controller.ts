@@ -71,7 +71,7 @@ export class TrackController {
 
     this.carControllers = cars.map((car) => {
       const controller = new CarController(
-        new CarView(car),
+        new CarView({ car, emitter: this.emitter }),
         this.engineService,
         this.garageService
       );
