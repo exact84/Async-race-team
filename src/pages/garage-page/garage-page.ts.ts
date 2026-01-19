@@ -57,6 +57,10 @@ export class GaragePage extends Component<object, State> {
 
     super.connectedCallback();
   }
+
+  protected disconnectedCallback(): void {
+    this.trackController.deinitialize();
+  }
 }
 
 defineElement('garage-page', GaragePage);

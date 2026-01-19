@@ -48,13 +48,13 @@ export class TrackController {
   }
 
   public deinitialize(): void {
+    this.trackAbortController?.abort();
+
     for (const unsubscribe of this.unsubscribeFunctions) {
       unsubscribe();
     }
 
     this.unsubscribeFunctions.clear();
-
-    this.trackAbortController?.abort();
   }
 
   public getView(): HTMLElement {
