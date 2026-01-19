@@ -11,28 +11,28 @@ export interface TrackControlProperties {
 }
 
 export class TrackControls extends Component<TrackControlProperties> {
-  private readonly createHundredButton = new Button({
+  private readonly buttonCreateHundred = new Button({
     onClick: (): void => {
       console.warn('Create 100 clicked');
     },
     textContent: 'Create 100 cars',
   });
 
-  private readonly createOneButton = new Button({
+  private readonly buttonCreateOne = new Button({
     onClick: (): void => {
       console.warn('Create 1 clicked');
     },
     textContent: 'Create car',
   });
 
-  private readonly startButton = new Button({
+  private readonly buttonStart = new Button({
     onClick: (): void => {
       this.props.emitter.emit('race:start');
     },
     textContent: 'Start race',
   });
 
-  private readonly stopButton = new Button({
+  private readonly buttonStop = new Button({
     onClick: (): void => {
       this.props.emitter.emit('race:stop');
     },
@@ -47,10 +47,10 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   public render(): DocumentFragment | HTMLElement {
     return createFragment(
-      this.startButton,
-      this.stopButton,
-      this.createOneButton,
-      this.createHundredButton
+      this.buttonStart,
+      this.buttonStop,
+      this.buttonCreateOne,
+      this.buttonCreateHundred
     );
   }
 }
