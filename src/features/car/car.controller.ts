@@ -24,7 +24,7 @@ export class CarController {
 
     this.view.setCallbacks({
       onDelete: () => this.delete(),
-      onDrive: (signal) => this.drive(signal),
+      onDrive: (signal) => this.startAndDrive(signal),
       onStop: () => this.stop(),
       onUpdate: (data) => this.update(data),
     });
@@ -34,20 +34,51 @@ export class CarController {
     return this.garageService.delete(this.carId, this.driveAbortController?.signal);
   }
 
-  public drive(parentSignal: AbortSignal): Promise<DriveResult> {
+  public disableButtons(): void {
+    this.view.setButtonsState({ delete: true, start: true, stop: true, update: true });
+  }
+
+  public drive(parentSignal: AbortSignal): Promise<Car & { success: boolean }> {
     const signal = this.recreateDriveAbortController(parentSignal);
 
-    return this.startEngine(signal).then(() => this.engineService.drive(this.carId, signal));
+    return this.engineService
+      .drive(this.carId, signal)
+      .then((result) => ({ ...this.view.getProps(), success: result.success }));
+  }
+
+  public enableButtons(): void {
+    this.view.setButtonsState({ delete: false, start: false, stop: true, update: false });
+  }
+
+  public getCarId(): number {
+    return this.carId;
   }
 
   public getView(): HTMLElement {
     return this.view;
   }
 
+  public pauseAnimation(): void {
+    this.view.pauseAnimation();
+  }
+
+  public startAndDrive(parentSignal: AbortSignal): Promise<DriveResult> {
+    const signal = this.recreateDriveAbortController(parentSignal);
+
+    return this.startEngine(signal).then(() => {
+      this.startAnimation();
+
+      return this.engineService.drive(this.carId, signal);
+    });
+  }
+
+  public startAnimation(): void {
+    this.view.startAnimation();
+  }
+
   public startEngine(signal: AbortSignal): Promise<DriveMetrics> {
     return this.engineService.toggle(this.carId, 'started', signal).then((metrics) => {
       this.view.setDriveMetrics(metrics);
-      this.view.drive();
       return metrics;
     });
   }
@@ -69,6 +100,10 @@ export class CarController {
     );
 
     return this.engineService.toggle(this.carId, 'stopped', stopController.signal);
+  }
+
+  public stopAnimation(): void {
+    this.view.stopAnimation();
   }
 
   public update(data: Omit<Car, 'id'>): Promise<Car> {

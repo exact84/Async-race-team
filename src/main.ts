@@ -1,7 +1,7 @@
 import 'modern-normalize/modern-normalize.css';
 
-import './styles/styles.css';
 import { App } from './app/app';
+import './styles/styles.css';
 
 const app = new App();
 

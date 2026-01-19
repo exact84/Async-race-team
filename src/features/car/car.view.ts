@@ -22,8 +22,10 @@ interface State {
   name: string;
 }
 
+const CROSS_LINE_WIDTH = 20;
+
 export class CarView extends Component<Car, State> {
-  private readonly abortController = new AbortController();
+  private abortController: AbortController | null = null;
 
   private animation: Animation | null = null;
 
@@ -61,16 +63,71 @@ export class CarView extends Component<Car, State> {
     this.className = styles.container;
 
     this.setButtonsState({ delete: false, start: false, stop: true, update: false });
-
-    this.initializeButtonListeners();
   }
 
-  public drive(): void {
+  public getAbortSignal(): AbortSignal {
+    this.abortController ??= new AbortController();
+
+    return this.abortController.signal;
+  }
+
+  public pauseAnimation(): void {
+    if (this.animation) {
+      this.animation.pause();
+    }
+  }
+
+  public render(): DocumentFragment {
+    this.abortController?.abort();
+    this.abortController = null;
+
+    this.abortController = new AbortController();
+
+    this.initializeButtonListeners();
+
+    this.carImage = new CarImage({ color: this.state.color });
+
+    return createFragment(
+      div(null, this.state.name),
+      this.carImage,
+      div(
+        { className: styles.buttonsContainer },
+        this.buttonStart,
+        this.buttonStop,
+        this.buttonUpdate,
+        this.buttonDelete
+      )
+    );
+  }
+
+  public setButtonsState(options: {
+    delete?: boolean;
+    start?: boolean;
+    stop?: boolean;
+    update?: boolean;
+  }): void {
+    const defaultValue = false;
+
+    this.buttonDelete.toggleDisabled(options.delete ?? defaultValue);
+    this.buttonStart.toggleDisabled(options.start ?? defaultValue);
+    this.buttonStop.toggleDisabled(options.stop ?? defaultValue);
+    this.buttonUpdate.toggleDisabled(options.update ?? defaultValue);
+  }
+
+  public setCallbacks(callbacks: CarViewCallbacks): void {
+    this.callbacks = callbacks;
+  }
+
+  public setDriveMetrics(driveMetrics: DriveMetrics): void {
+    this.driveMetrics = driveMetrics;
+  }
+
+  public startAnimation(): void {
     if (!this.carImage || !this.driveMetrics) {
       return;
     }
 
-    const endWidth = this.clientWidth - this.carImage.clientWidth;
+    const endWidth = this.clientWidth - this.carImage.clientWidth - CROSS_LINE_WIDTH;
 
     const duration = this.driveMetrics.distance / this.driveMetrics.velocity;
 
@@ -98,41 +155,7 @@ export class CarView extends Component<Car, State> {
     );
   }
 
-  public getAbortSignal(): AbortSignal {
-    return this.abortController.signal;
-  }
-
-  public pause(): void {
-    if (this.animation) {
-      this.animation.pause();
-    }
-  }
-
-  public render(): DocumentFragment {
-    this.carImage = new CarImage({ color: this.state.color });
-
-    return createFragment(
-      div(null, this.state.name),
-      this.carImage,
-      div(
-        { className: styles.buttonsContainer },
-        this.buttonStart,
-        this.buttonStop,
-        this.buttonUpdate,
-        this.buttonDelete
-      )
-    );
-  }
-
-  public setCallbacks(callbacks: CarViewCallbacks): void {
-    this.callbacks = callbacks;
-  }
-
-  public setDriveMetrics(driveMetrics: DriveMetrics): void {
-    this.driveMetrics = driveMetrics;
-  }
-
-  public stop(): void {
+  public stopAnimation(): void {
     if (!this.carImage) {
       return;
     }
@@ -146,7 +169,8 @@ export class CarView extends Component<Car, State> {
   }
 
   protected disconnectedCallback(): void {
-    this.abortController.abort();
+    this.abortController?.abort();
+    this.abortController = null;
   }
 
   private initializeButtonListeners(): void {
@@ -201,7 +225,7 @@ export class CarView extends Component<Car, State> {
     try {
       await this.callbacks?.onDrive(this.getAbortSignal());
     } catch {
-      this.pause();
+      this.pauseAnimation();
     } finally {
       this.setButtonsState({ delete: true, start: true, stop: false, update: true });
     }
@@ -213,7 +237,7 @@ export class CarView extends Component<Car, State> {
     try {
       await this.callbacks?.onStop();
 
-      this.stop();
+      this.stopAnimation();
     } finally {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
@@ -234,20 +258,6 @@ export class CarView extends Component<Car, State> {
     } finally {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
-  }
-
-  private setButtonsState(options: {
-    delete?: boolean;
-    start?: boolean;
-    stop?: boolean;
-    update?: boolean;
-  }): void {
-    const defaultValue = false;
-
-    this.buttonDelete.toggleDisabled(options.delete ?? defaultValue);
-    this.buttonStart.toggleDisabled(options.start ?? defaultValue);
-    this.buttonStop.toggleDisabled(options.stop ?? defaultValue);
-    this.buttonUpdate.toggleDisabled(options.update ?? defaultValue);
   }
 }
 
