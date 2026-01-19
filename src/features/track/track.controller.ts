@@ -1,8 +1,10 @@
+import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { EngineService } from '../../services/engine-service/engine.service';
 import type { DriveMetrics } from '../../services/engine-service/types';
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
 import type { WinnersService } from '../../services/winners-service/winners.service';
+import type { Emitter } from '../../shared/event-emitter/event-emitter';
 import type { TrackView } from './track.view';
 
 import { CarController } from '../car/car.controller';
@@ -14,6 +16,8 @@ const FRACTION_DIGITS = 2;
 export class TrackController {
   private carControllers: CarController[] = [];
 
+  private readonly emitter: Emitter<GaragePageEvents> | null = null;
+
   private readonly engineService: EngineService;
 
   private readonly garageService: GarageService;
@@ -21,6 +25,8 @@ export class TrackController {
   private readonly startedEngines = new Set<number>();
 
   private trackAbortController: AbortController | null = null;
+
+  private readonly unsubscribeFunctions = new Set<VoidFunction>();
 
   private readonly view: TrackView;
 
@@ -30,12 +36,25 @@ export class TrackController {
     view: TrackView,
     engineService: EngineService,
     garageService: GarageService,
-    winnersService: WinnersService
+    winnersService: WinnersService,
+    emitter: Emitter<GaragePageEvents> | null = null
   ) {
     this.view = view;
     this.engineService = engineService;
     this.garageService = garageService;
     this.winnersService = winnersService;
+
+    this.emitter = emitter;
+  }
+
+  public deinitialize(): void {
+    for (const unsubscribe of this.unsubscribeFunctions) {
+      unsubscribe();
+    }
+
+    this.unsubscribeFunctions.clear();
+
+    this.trackAbortController?.abort();
   }
 
   public getView(): HTMLElement {
@@ -43,6 +62,8 @@ export class TrackController {
   }
 
   public async initialize(): Promise<void> {
+    this.setupListeners();
+
     const cars = await this.garageService.getAll();
 
     this.carControllers = cars.map(
@@ -111,6 +132,22 @@ export class TrackController {
           throw new Error('Car crashed');
         })
     );
+  }
+
+  private setupListeners(): void {
+    if (!this.emitter) {
+      return;
+    }
+
+    const unusbscribeStartRace = this.emitter.on('race:start', () => {
+      this.startRace().catch(console.warn);
+    });
+
+    const unsubscribeStopRace = this.emitter.on('race:stop', () => {
+      this.stopRace().catch(console.warn);
+    });
+
+    this.unsubscribeFunctions.add(unusbscribeStartRace).add(unsubscribeStopRace);
   }
 
   private async startAllEngines(signal: AbortSignal): Promise<void> {
