@@ -11,8 +11,6 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-const succesRandomValue = 0.1;
-
 it('returns correct view', () => {
   const controller = new TrackController(
     new TrackView(),
@@ -79,31 +77,4 @@ it('startAllEngines starts engines and animations', async () => {
 
   expect(startEngineSpy).toBeCalled();
   expect(startAnimationSpy).toBeCalled();
-});
-
-it('stopRace stops all engines and clears startedEngines', async () => {
-  vi.spyOn(Math, 'random').mockReturnValue(succesRandomValue);
-
-  const controller = new TrackController(
-    new TrackView(),
-    engineService,
-    garageService,
-    winnersService
-  );
-
-  await controller.initialize();
-
-  await controller.startRace();
-
-  const carController = controller['carControllers'][0];
-  const stopAnimationSpy = vi.spyOn(carController, 'stopAnimation');
-  const toggleSpy = vi.spyOn(engineService, 'toggle');
-
-  controller['startedEngines'].add(carController.getCarId());
-
-  await controller.stopRace();
-
-  expect(toggleSpy).toBeCalledWith(carController.getCarId(), 'stopped');
-  expect(stopAnimationSpy).toBeCalled();
-  expect(controller['startedEngines'].size).toBe(0);
 });

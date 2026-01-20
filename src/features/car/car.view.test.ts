@@ -13,14 +13,14 @@ afterEach(() => {
 });
 
 it('should render to DOM', () => {
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   expect(view).toBeInTheDocument();
 });
 
 it('should call onDrive callback when Start button is clicked', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 
@@ -32,7 +32,7 @@ it('should call onDrive callback when Start button is clicked', async () => {
 
 it('should call onStop callback when Stop button is clicked', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 
@@ -47,7 +47,7 @@ it('should call onStop callback when Stop button is clicked', async () => {
 
 it('should call onDelete callback when Delete button is clicked', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 
@@ -59,7 +59,7 @@ it('should call onDelete callback when Delete button is clicked', async () => {
 
 it('should call onUpdate callback when Update button is clicked', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 
@@ -70,7 +70,7 @@ it('should call onUpdate callback when Update button is clicked', async () => {
 });
 
 it('Stop button should be disabled initially', () => {
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 
@@ -81,7 +81,7 @@ it('Stop button should be disabled initially', () => {
 
 it('Start, Update and Delete buttons should be disabled after Start clicked', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 
@@ -100,7 +100,7 @@ it('Start, Update and Delete buttons should be disabled after Start clicked', as
 
 it('Start, Update and Delete buttons should be enabled after Stop clicked', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 
@@ -120,7 +120,7 @@ it('Start, Update and Delete buttons should be enabled after Stop clicked', asyn
 });
 
 it('should handle drive without driveMetrics', () => {
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   expect(() => {
     view.startAnimation();
@@ -128,7 +128,7 @@ it('should handle drive without driveMetrics', () => {
 });
 
 it('should toggle all buttons combinations in setButtonsState', () => {
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
   view.setCallbacks(mockCallbacks);
 
   const buttonStart = getByTestId(view, 'button-start');
@@ -146,7 +146,7 @@ it('should toggle all buttons combinations in setButtonsState', () => {
 
 it('onStartButtonClick should call pauseAnimation on error', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   const pauseSpy = vi.spyOn(view, 'pauseAnimation');
 
@@ -160,7 +160,7 @@ it('onStartButtonClick should call pauseAnimation on error', async () => {
 
 it('onDeleteButtonClick should restore buttons on error', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks({ ...mockCallbacks, onDelete: vi.fn().mockRejectedValue(new Error('fff')) });
 
@@ -172,7 +172,7 @@ it('onDeleteButtonClick should restore buttons on error', async () => {
 
 it('onUpdateButtonClick should update name and color', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks({
     ...mockCallbacks,
@@ -186,7 +186,7 @@ it('onUpdateButtonClick should update name and color', async () => {
 });
 
 it('disconnectedCallback should abort internal AbortController', () => {
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   const signal = view.getAbortSignal();
   expect(signal.aborted).toBe(false);
@@ -198,7 +198,7 @@ it('disconnectedCallback should abort internal AbortController', () => {
 
 it('onStopButtonClick should always restore buttons state', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks({
     ...mockCallbacks,
@@ -216,7 +216,7 @@ it('onStopButtonClick should always restore buttons state', async () => {
 
 it('onUpdateButtonClick should exit early when callback returns undefined', async () => {
   const user = userEvent.setup();
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks({ ...mockCallbacks, onUpdate: vi.fn().mockResolvedValue(null) });
 
@@ -228,7 +228,7 @@ it('onUpdateButtonClick should exit early when callback returns undefined', asyn
 });
 
 it('setCallbacks should store callbacks reference', () => {
-  const view = render(() => new CarView(MOCK_SINGLE_CAR));
+  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
   view.setCallbacks(mockCallbacks);
 

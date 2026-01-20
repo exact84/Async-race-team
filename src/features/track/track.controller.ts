@@ -1,8 +1,9 @@
+import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { EngineService } from '../../services/engine-service/engine.service';
-import type { DriveMetrics } from '../../services/engine-service/types';
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
 import type { WinnersService } from '../../services/winners-service/winners.service';
+import type { Emitter } from '../../shared/event-emitter/event-emitter';
 import type { TrackView } from './track.view';
 
 import { CarController } from '../car/car.controller';
@@ -14,13 +15,21 @@ const FRACTION_DIGITS = 2;
 export class TrackController {
   private carControllers: CarController[] = [];
 
+  private readonly emitter: Emitter<GaragePageEvents> | null = null;
+
   private readonly engineService: EngineService;
 
   private readonly garageService: GarageService;
 
+  private readonly singleStartedEngines = new Set<number>();
+
+  private startAbortController: AbortController | null = null;
+
   private readonly startedEngines = new Set<number>();
 
-  private trackAbortController: AbortController | null = null;
+  private stopAbortController: AbortController | null = null;
+
+  private readonly unsubscribeFunctions = new Set<VoidFunction>();
 
   private readonly view: TrackView;
 
@@ -30,12 +39,25 @@ export class TrackController {
     view: TrackView,
     engineService: EngineService,
     garageService: GarageService,
-    winnersService: WinnersService
+    winnersService: WinnersService,
+    emitter: Emitter<GaragePageEvents> | null = null
   ) {
     this.view = view;
     this.engineService = engineService;
     this.garageService = garageService;
     this.winnersService = winnersService;
+
+    this.emitter = emitter;
+  }
+
+  public deinitialize(): void {
+    this.startAbortController?.abort();
+
+    for (const unsubscribe of this.unsubscribeFunctions) {
+      unsubscribe();
+    }
+
+    this.unsubscribeFunctions.clear();
   }
 
   public getView(): HTMLElement {
@@ -43,28 +65,26 @@ export class TrackController {
   }
 
   public async initialize(): Promise<void> {
+    this.setupListeners();
+
     const cars = await this.garageService.getAll();
 
-    this.carControllers = cars.map(
-      (car) => new CarController(new CarView(car), this.engineService, this.garageService)
-    );
-
-    this.view.setState({ carControllers: this.carControllers });
+    this.updateView(cars);
   }
 
   public async startRace(): Promise<void> {
-    this.trackAbortController?.abort();
-    this.trackAbortController = new AbortController();
+    this.stopAbortController?.abort();
+    this.stopAbortController = null;
 
-    const signal = this.trackAbortController.signal;
+    this.startAbortController = this.recreateAbortcontroller(this.startAbortController);
+    const startSignal = this.startAbortController.signal;
 
-    await this.stopAllCars();
+    await this.stopRunningCars();
 
-    await this.startAllEngines(signal);
+    await this.startAllEngines(startSignal);
 
     const startTime = Date.now();
-
-    const drivePromises = this.driveAllCars(startTime, signal);
+    const drivePromises = this.driveAllCars(startTime, startSignal);
 
     const winner = await Promise.any(drivePromises).catch(() => null);
 
@@ -73,18 +93,19 @@ export class TrackController {
     }
 
     await Promise.allSettled(drivePromises);
+
+    this.emitter?.emit('race:completed');
   }
 
   public async stopRace(): Promise<void> {
-    if (!this.trackAbortController) {
-      return;
-    }
+    this.startAbortController?.abort();
+    this.startAbortController = null;
 
-    this.trackAbortController.abort();
-    this.trackAbortController = null;
+    this.stopAbortController = this.recreateAbortcontroller(this.stopAbortController);
+    const stopSignal = this.stopAbortController.signal;
 
     const stopPromises = Array.from(this.startedEngines, (id) =>
-      this.engineService.toggle(id, 'stopped')
+      this.engineService.toggle(id, 'stopped', stopSignal)
     );
 
     await Promise.all(stopPromises);
@@ -113,11 +134,57 @@ export class TrackController {
     );
   }
 
+  private recreateAbortcontroller(controller: AbortController | null): AbortController {
+    controller?.abort();
+    return new AbortController();
+  }
+
+  private setupListeners(): void {
+    if (!this.emitter) {
+      return;
+    }
+
+    const unsubscribeStartRace = this.emitter.on('race:start', () => {
+      for (const controller of this.carControllers) {
+        controller.disableButtons();
+      }
+
+      this.startRace().catch(console.warn);
+    });
+
+    const unsubscribeStopRace = this.emitter.on('race:stop', () => {
+      this.stopRace().catch(console.warn);
+    });
+
+    const unsubscribeCreateHundred = this.emitter.on('garage:create-hundred', () => {
+      Promise.all([this.garageService.createRandomCars(), this.garageService.getAll()])
+        .then((data) => {
+          this.updateView(data[1]);
+          this.emitter?.emit('garage:created-hundred');
+        })
+        .catch(console.warn);
+    });
+
+    const unsubscribeCreateOne = this.emitter.on('garage:create-one', (payload) => {
+      Promise.all([this.garageService.create(payload), this.garageService.getAll()])
+        .then((data) => {
+          this.updateView(data[1]);
+          this.emitter?.emit('garage:created-one');
+        })
+        .catch(console.warn);
+    });
+
+    this.unsubscribeFunctions
+      .add(unsubscribeStartRace)
+      .add(unsubscribeStopRace)
+      .add(unsubscribeCreateHundred)
+      .add(unsubscribeCreateOne);
+  }
+
   private async startAllEngines(signal: AbortSignal): Promise<void> {
     await Promise.all(
       this.carControllers.map((controller) => {
         this.startedEngines.add(controller.getCarId());
-        controller.disableButtons();
 
         return controller.startEngine(signal);
       })
@@ -128,12 +195,36 @@ export class TrackController {
     }
   }
 
-  private stopAllCars(): Promise<(DriveMetrics | null)[]> {
-    const stopPromises = this.carControllers.map((controller) => {
-      return controller.stop().catch(() => null);
+  private async stopRunningCars(): Promise<void> {
+    if (this.singleStartedEngines.size === 0) {
+      return;
+    }
+
+    const stopPromises = this.carControllers
+      .filter((c) => this.singleStartedEngines.has(c.getCarId()))
+      .map((controller) => controller.stop().catch(() => null));
+
+    await Promise.all(stopPromises);
+
+    this.singleStartedEngines.clear();
+  }
+
+  private updateView(cars: Car[]): void {
+    this.carControllers = cars.map((car) => {
+      const controller = new CarController(
+        new CarView({ car, emitter: this.emitter }),
+        this.engineService,
+        this.garageService
+      );
+
+      controller.setOnSingleStart((id) => {
+        this.singleStartedEngines.add(id);
+      });
+
+      return controller;
     });
 
-    return Promise.all(stopPromises);
+    this.view.setState({ carControllers: this.carControllers });
   }
 }
 

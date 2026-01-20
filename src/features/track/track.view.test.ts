@@ -10,7 +10,11 @@ import { TrackView } from './track.view';
 const engineService = serviceProvider.engineService();
 const garageService = serviceProvider.garageService();
 
-const controller = new CarController(new CarView(MOCK_SINGLE_CAR), engineService, garageService);
+const controller = new CarController(
+  new CarView({ car: MOCK_SINGLE_CAR, emitter: null }),
+  engineService,
+  garageService
+);
 
 it('should be in DOM', () => {
   const view = render(() => new TrackView());
