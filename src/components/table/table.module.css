@@ -1,0 +1,49 @@
+.table {
+  cursor: default;
+
+  overflow-y: auto;
+  display: block;
+  border-collapse: collapse;
+
+  width: fit-content;
+  max-height: 600px;
+  margin: 1rem 0;
+}
+
+.thead {
+  background-color: var(--bg-color);
+  filter: brightness(150%);
+}
+
+.thead.sticky {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+}
+
+.th,
+.td {
+  padding: 8px 12px;
+  border: 1px solid var(--fg-color);
+  text-align: left;
+}
+
+.tr {
+  background-color: var(--bg-color);
+  transition: background-color var(--transition-duration) ease-in-out;
+}
+
+.tr:nth-child(even) {
+  background-color: var(--bg-color);
+  filter: brightness(70%);
+}
+
+.fallbackMessage {
+  text-align: center;
+
+  /* padding: 10px, 0; */
+}
+
+.tr:hover {
+  background-color: var(--accent-color-hover);
+}
