@@ -1,14 +1,10 @@
-<<<<<<< HEAD
 export const MOCK_SINGLE_CAR = { color: '#000000', id: 2, name: 'Ferrari' };
-=======
+
 import type { WinnerWithCarData } from '../src/services/winners-service/types';
 
 const MAX_COLOR = 0xff_ff_ff;
 const MAX_VALUE = 100;
 const HEX_RADIX = 16;
-
-export const MOCK_SINGLE_CAR = { color: 'black', id: 2, name: 'Ferrari' };
->>>>>>> 89fe7c0 (feat: add image to table)
 
 export const MOCK_CARS_ARRAY = [
   { color: 'red', id: 0, name: 'Tesla' },
