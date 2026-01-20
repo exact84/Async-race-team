@@ -15,6 +15,7 @@ export class TrackControls extends Component<TrackControlProperties> {
     onClick: (): void => {
       console.warn('Create 100 clicked');
     },
+    testid: 'button-track-create-100',
     textContent: 'Create 100 cars',
   });
 
@@ -22,6 +23,7 @@ export class TrackControls extends Component<TrackControlProperties> {
     onClick: (): void => {
       console.warn('Create 1 clicked');
     },
+    testid: 'button-track-create-1',
     textContent: 'Create car',
   });
 
@@ -31,6 +33,7 @@ export class TrackControls extends Component<TrackControlProperties> {
 
       this.props.emitter.emit('race:start');
     },
+    testid: 'button-track-start',
     textContent: 'Start race',
   });
 
@@ -40,6 +43,7 @@ export class TrackControls extends Component<TrackControlProperties> {
 
       this.props.emitter.emit('race:stop');
     },
+    testid: 'button-track-stop',
     textContent: 'Stop race',
   });
 
@@ -60,7 +64,7 @@ export class TrackControls extends Component<TrackControlProperties> {
     );
   }
 
-  private setButtonsState(options: {
+  public setButtonsState(options: {
     createHundred?: boolean;
     createOne?: boolean;
     start?: boolean;
