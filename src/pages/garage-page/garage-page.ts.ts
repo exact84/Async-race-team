@@ -59,12 +59,7 @@ export class GaragePage extends Component {
 
     this.setupEmitterHandlers();
 
-    garageService.getTotalCount().then(
-      (count) => {
-        garageStore.setState({ totalCarsCount: Number(count ?? 0) });
-      },
-      () => null
-    );
+    this.setTotalCount();
 
     super.connectedCallback();
   }
@@ -79,23 +74,22 @@ export class GaragePage extends Component {
     this.unsubscribeFunctions.clear();
   }
 
+  private setTotalCount(): void {
+    garageService.getTotalCount().then(
+      (count) => {
+        garageStore.setState({ totalCount: Number.parseInt(count ?? '0') });
+      },
+      () => null
+    );
+  }
+
   private setupEmitterHandlers(): void {
     const unsubscribeCreatedOne = garageEmitter.on('garage:created-one', () => {
-      garageService.getTotalCount().then(
-        (count) => {
-          garageStore.setState({ totalCarsCount: Number.parseInt(count ?? '0') });
-        },
-        () => null
-      );
+      this.setTotalCount();
     });
 
     const unsubscribeCreatedHundred = garageEmitter.on('garage:created-hundred', () => {
-      garageService.getTotalCount().then(
-        (count) => {
-          garageStore.setState({ totalCarsCount: Number.parseInt(count ?? '0') });
-        },
-        () => null
-      );
+      this.setTotalCount();
     });
 
     this.unsubscribeFunctions.add(unsubscribeCreatedOne).add(unsubscribeCreatedHundred);
@@ -104,19 +98,21 @@ export class GaragePage extends Component {
   private setupStoreSubscriptions(): void {
     const unsubscribe = garageStore.subscribe(
       (state) => state,
-      ({ currentPage, totalCarsCount }) => {
+      ({ currentPage, totalCount }) => {
+        this.pagination.setState({
+          page: currentPage,
+          totalPages: Math.ceil(totalCount / CARS_PER_PAGE),
+        });
+
+        this.totalCarsSpan.textContent = totalCount.toString();
+
         garageService.getAll({ page: currentPage }).then(
           (cars) => {
             this.trackController.updateView(cars);
-
-            this.pagination.setState({
-              page: currentPage,
-              totalPages: Math.ceil(totalCarsCount / CARS_PER_PAGE),
-            });
-
-            this.totalCarsSpan.textContent = totalCarsCount.toString();
           },
-          () => null
+          () => {
+            this.trackController.updateView([]);
+          }
         );
       }
     );
