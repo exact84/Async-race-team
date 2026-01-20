@@ -1,18 +1,21 @@
-/* eslint-disable perfectionist/sort-classes */
 import { div, h1 } from '@ripetchor/dom';
 
 import type { SortField, SortOrder } from '../../services/winners-service/types';
 
 import { Button } from '../../components/button/button';
 import { Table } from '../../components/table/table';
-import { Component, defineElement } from '../../shared/component/component';
 import {
   DEFAULT_LIMIT,
   DEFAULT_SORT_FIELD,
   WinnersPageController,
-} from './winners-page.controller';
+} from '../../components/table/table.controller';
+import { Component, defineElement } from '../../shared/component/component';
 
 export class WinnersPage extends Component {
+  private currentOrder: SortOrder = 'ASC';
+
+  private currentSort: SortField = DEFAULT_SORT_FIELD;
+
   private table = new Table({
     fallbackMessage: 'Loading...',
     headers: [],
@@ -21,21 +24,6 @@ export class WinnersPage extends Component {
   });
 
   private winnersPageController = new WinnersPageController();
-
-  private currentOrder: SortOrder = 'ASC';
-
-  private currentSort: SortField = DEFAULT_SORT_FIELD;
-
-  private async handleSort(field: SortField): Promise<void> {
-    if (this.currentSort === field) {
-      this.currentOrder = this.currentOrder === 'ASC' ? 'DESC' : 'ASC';
-    } else {
-      this.currentSort = field;
-    }
-    console.warn('Sorting by:', this.currentSort, this.currentOrder);
-
-    await this.getData(this.currentSort, this.currentOrder);
-  }
 
   public connectedCallback(): void {
     super.connectedCallback();
@@ -83,6 +71,17 @@ export class WinnersPage extends Component {
     }
 
     this.setState({});
+  }
+
+  private async handleSort(field: SortField): Promise<void> {
+    if (this.currentSort === field) {
+      this.currentOrder = this.currentOrder === 'ASC' ? 'DESC' : 'ASC';
+    } else {
+      this.currentSort = field;
+    }
+    console.warn('Sorting by:', this.currentSort, this.currentOrder);
+
+    await this.getData(this.currentSort, this.currentOrder);
   }
 }
 

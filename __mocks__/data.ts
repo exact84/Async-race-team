@@ -1,4 +1,14 @@
+<<<<<<< HEAD
 export const MOCK_SINGLE_CAR = { color: '#000000', id: 2, name: 'Ferrari' };
+=======
+import type { WinnerWithCarData } from '../src/services/winners-service/types';
+
+const MAX_COLOR = 0xff_ff_ff;
+const MAX_VALUE = 100;
+const HEX_RADIX = 16;
+
+export const MOCK_SINGLE_CAR = { color: 'black', id: 2, name: 'Ferrari' };
+>>>>>>> 89fe7c0 (feat: add image to table)
 
 export const MOCK_CARS_ARRAY = [
   { color: 'red', id: 0, name: 'Tesla' },
@@ -18,3 +28,13 @@ export const MOCK_STARTED_ENGINE_METRICS = { distance: 100, velocity: 64 };
 export const MOCK_STOPPED_ENGINE_METRICS = { distance: 100, velocity: 0 };
 
 export const MOCK_SUCCESS_DRIVE_RESULT = { success: true };
+
+export function generateWinners(count: number): WinnerWithCarData[] {
+  return Array.from({ length: count }, (_, index) => ({
+    color: `#${Math.floor(Math.random() * MAX_COLOR).toString(HEX_RADIX)}`,
+    id: index + 1,
+    name: `Car ${String(index + 1)}`,
+    time: Math.floor(Math.random() * MAX_VALUE),
+    wins: Math.floor(Math.random() * MAX_VALUE),
+  }));
+}

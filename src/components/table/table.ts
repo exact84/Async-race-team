@@ -1,6 +1,8 @@
 /* eslint-disable perfectionist/sort-interfaces */
 import { caption, table, tbody, td, th, thead, tr } from '@ripetchor/dom';
 
+import type { TableRecord } from './table.controller';
+
 import { Component, defineElement } from '../../shared/component/component';
 import styles from './table.module.css';
 
@@ -10,7 +12,7 @@ export interface TableProperties {
   stickyHeader?: boolean;
   testid: string;
   headers: string[];
-  records: string[][];
+  records: TableRecord[];
   fallbackMessage?: string;
 }
 
@@ -42,7 +44,7 @@ export class Table extends Component<TableProperties> {
               ...this.props.records.map((record) =>
                 tr(
                   { className: styles.tr },
-                  ...record.map((cell) => td({ className: styles.td }, cell))
+                  ...record.cells.map((cell) => td({ className: styles.td }, cell.value))
                 )
               )
             ),
