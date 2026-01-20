@@ -1,6 +1,7 @@
 import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { Emitter } from '../../shared/event-emitter/event-emitter';
 
+import { createRandomCar } from '../../services/garage-service/utilities';
 import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
 import { Button } from '../button/button';
@@ -21,7 +22,7 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   private readonly buttonCreateOne = new Button({
     onClick: (): void => {
-      console.warn('Create 1 clicked');
+      this.props.emitter.emit('garage:create-1', createRandomCar());
     },
     testid: 'button-track-create-1',
     textContent: 'Create car',

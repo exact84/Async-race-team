@@ -164,10 +164,19 @@ export class TrackController {
         .catch(console.warn);
     });
 
+    const unssubscribeCreateOne = this.emitter.on('garage:create-1', (payload) => {
+      Promise.all([this.garageService.create(payload), this.garageService.getAll()])
+        .then((data) => {
+          this.updateView(data[1]);
+        })
+        .catch(console.warn);
+    });
+
     this.unsubscribeFunctions
       .add(unusbscribeStartRace)
       .add(unsubscribeStopRace)
-      .add(unsubscribeCreateHundred);
+      .add(unsubscribeCreateHundred)
+      .add(unssubscribeCreateOne);
   }
 
   private async startAllEngines(signal: AbortSignal): Promise<void> {
