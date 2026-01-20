@@ -69,21 +69,7 @@ export class TrackController {
 
     const cars = await this.garageService.getAll();
 
-    this.carControllers = cars.map((car) => {
-      const controller = new CarController(
-        new CarView({ car, emitter: this.emitter }),
-        this.engineService,
-        this.garageService
-      );
-
-      controller.setOnSingleStart((id) => {
-        this.singleStartedEngines.add(id);
-      });
-
-      return controller;
-    });
-
-    this.view.setState({ carControllers: this.carControllers });
+    this.updateView(cars);
   }
 
   public async startRace(): Promise<void> {
@@ -171,24 +157,9 @@ export class TrackController {
     });
 
     const unsubscribeCreateHundred = this.emitter.on('garage:create-100', () => {
-      this.garageService
-        .createRandomCars()
-        .then((cars) => {
-          this.carControllers = cars.map((car) => {
-            const controller = new CarController(
-              new CarView({ car, emitter: this.emitter }),
-              this.engineService,
-              this.garageService
-            );
-
-            controller.setOnSingleStart((id) => {
-              this.singleStartedEngines.add(id);
-            });
-
-            return controller;
-          });
-
-          this.view.setState({ carControllers: this.carControllers });
+      Promise.all([this.garageService.createRandomCars(), this.garageService.getAll()])
+        .then((data) => {
+          this.updateView(data[1]);
         })
         .catch(console.warn);
     });
@@ -225,6 +196,24 @@ export class TrackController {
     await Promise.all(stopPromises);
 
     this.singleStartedEngines.clear();
+  }
+
+  private updateView(cars: Car[]): void {
+    this.carControllers = cars.map((car) => {
+      const controller = new CarController(
+        new CarView({ car, emitter: this.emitter }),
+        this.engineService,
+        this.garageService
+      );
+
+      controller.setOnSingleStart((id) => {
+        this.singleStartedEngines.add(id);
+      });
+
+      return controller;
+    });
+
+    this.view.setState({ carControllers: this.carControllers });
   }
 }
 
