@@ -13,7 +13,7 @@ export interface TrackControlProperties {
 export class TrackControls extends Component<TrackControlProperties> {
   private readonly buttonCreateHundred = new Button({
     onClick: (): void => {
-      console.warn('Create 100 clicked');
+      this.props.emitter.emit('garage:create-100');
     },
     testid: 'button-track-create-100',
     textContent: 'Create 100 cars',

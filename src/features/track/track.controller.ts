@@ -170,7 +170,33 @@ export class TrackController {
       this.stopRace().catch(console.warn);
     });
 
-    this.unsubscribeFunctions.add(unusbscribeStartRace).add(unsubscribeStopRace);
+    const unsubscribeCreateHundred = this.emitter.on('garage:create-100', () => {
+      this.garageService
+        .createRandomCars()
+        .then((cars) => {
+          this.carControllers = cars.map((car) => {
+            const controller = new CarController(
+              new CarView({ car, emitter: this.emitter }),
+              this.engineService,
+              this.garageService
+            );
+
+            controller.setOnSingleStart((id) => {
+              this.singleStartedEngines.add(id);
+            });
+
+            return controller;
+          });
+
+          this.view.setState({ carControllers: this.carControllers });
+        })
+        .catch(console.warn);
+    });
+
+    this.unsubscribeFunctions
+      .add(unusbscribeStartRace)
+      .add(unsubscribeStopRace)
+      .add(unsubscribeCreateHundred);
   }
 
   private async startAllEngines(signal: AbortSignal): Promise<void> {
