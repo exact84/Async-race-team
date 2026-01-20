@@ -14,7 +14,7 @@ export interface TrackControlProperties {
 export class TrackControls extends Component<TrackControlProperties> {
   private readonly buttonCreateHundred = new Button({
     onClick: (): void => {
-      this.props.emitter.emit('garage:create-100');
+      this.props.emitter.emit('garage:create-hundred');
     },
     testid: 'button-track-create-100',
     textContent: 'Create 100 cars',
@@ -22,7 +22,7 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   private readonly buttonCreateOne = new Button({
     onClick: (): void => {
-      this.props.emitter.emit('garage:create-1', createRandomCar());
+      this.props.emitter.emit('garage:create-one', createRandomCar());
     },
     testid: 'button-track-create-1',
     textContent: 'Create car',

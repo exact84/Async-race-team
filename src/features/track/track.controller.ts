@@ -156,7 +156,7 @@ export class TrackController {
       this.stopRace().catch(console.warn);
     });
 
-    const unsubscribeCreateHundred = this.emitter.on('garage:create-100', () => {
+    const unsubscribeCreateHundred = this.emitter.on('garage:create-hundred', () => {
       Promise.all([this.garageService.createRandomCars(), this.garageService.getAll()])
         .then((data) => {
           this.updateView(data[1]);
@@ -165,7 +165,7 @@ export class TrackController {
         .catch(console.warn);
     });
 
-    const unssubscribeCreateOne = this.emitter.on('garage:create-1', (payload) => {
+    const unssubscribeCreateOne = this.emitter.on('garage:create-one', (payload) => {
       Promise.all([this.garageService.create(payload), this.garageService.getAll()])
         .then((data) => {
           this.updateView(data[1]);
