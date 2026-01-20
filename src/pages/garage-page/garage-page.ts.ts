@@ -1,4 +1,4 @@
-import { div, h1 } from '@ripetchor/dom';
+import { div, h1, span } from '@ripetchor/dom';
 
 import { garageEmitter } from '../../app/garage-emitter/garage-emitter';
 import { TrackControls } from '../../components/track-controls/track-controls';
@@ -7,21 +7,19 @@ import { TrackView } from '../../features/track/track.view';
 import { serviceProvider } from '../../services/service-provider';
 import { Component, defineElement } from '../../shared/component/component';
 
-interface State {
-  carsCount: string;
-}
-
 const engineService = serviceProvider.engineService();
 const garageService = serviceProvider.garageService();
 const winnersService = serviceProvider.winnersService();
 
-export class GaragePage extends Component<object, State> {
+export class GaragePage extends Component {
+  private readonly totalCarsSpan = span(null);
+
   private readonly trackController: TrackController;
+
+  private readonly unsubscribeFunctions = new Set<VoidFunction>();
 
   public constructor() {
     super();
-
-    this.state = { carsCount: '0' };
 
     this.trackController = new TrackController(
       new TrackView(),
@@ -32,6 +30,8 @@ export class GaragePage extends Component<object, State> {
     );
 
     this.trackController.initialize().catch(console.warn);
+
+    this.setupListeners();
   }
 
   public render(): HTMLElement {
@@ -39,27 +39,49 @@ export class GaragePage extends Component<object, State> {
 
     return div(
       { className: 'page' },
-      h1(null, `Garage (${this.state.carsCount})`),
+      h1(null, 'Garage: ', this.totalCarsSpan),
       trackControls,
       this.trackController.getView()
     );
   }
 
   protected override connectedCallback(): void {
-    garageService.getTotalCount().then(
-      (count) => {
-        this.setState({ carsCount: count ?? '0' });
-      },
-      () => {
-        console.warn('Failed to get cars count');
-      }
-    );
+    this.updateTotalCarsCount();
 
     super.connectedCallback();
   }
 
   protected disconnectedCallback(): void {
     this.trackController.deinitialize();
+
+    for (const unsubscribe of this.unsubscribeFunctions) {
+      unsubscribe();
+    }
+
+    this.unsubscribeFunctions.clear();
+  }
+
+  private setupListeners(): void {
+    const unsubscribeCreatedOne = garageEmitter.on('garage:created-one', () => {
+      this.updateTotalCarsCount();
+    });
+
+    const unsubscribeCreatedHundred = garageEmitter.on('garage:created-hundred', () => {
+      this.updateTotalCarsCount();
+    });
+
+    this.unsubscribeFunctions.add(unsubscribeCreatedOne).add(unsubscribeCreatedHundred);
+  }
+
+  private updateTotalCarsCount(): void {
+    garageService.getTotalCount().then(
+      (count) => {
+        this.totalCarsSpan.textContent = count ?? '0';
+      },
+      () => {
+        console.warn('Failed to get cars count');
+      }
+    );
   }
 }
 

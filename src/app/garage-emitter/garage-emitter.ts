@@ -5,6 +5,8 @@ import { Emitter } from '../../shared/event-emitter/event-emitter';
 export interface GaragePageEvents {
   'garage:create-1': Omit<Car, 'id'>;
   'garage:create-100': never;
+  'garage:created-hundred': never;
+  'garage:created-one': never;
   'race:completed': never;
   'race:start': never;
   'race:stop': never;

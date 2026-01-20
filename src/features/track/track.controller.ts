@@ -160,6 +160,7 @@ export class TrackController {
       Promise.all([this.garageService.createRandomCars(), this.garageService.getAll()])
         .then((data) => {
           this.updateView(data[1]);
+          this.emitter?.emit('garage:created-hundred');
         })
         .catch(console.warn);
     });
@@ -168,6 +169,7 @@ export class TrackController {
       Promise.all([this.garageService.create(payload), this.garageService.getAll()])
         .then((data) => {
           this.updateView(data[1]);
+          this.emitter?.emit('garage:created-one');
         })
         .catch(console.warn);
     });
