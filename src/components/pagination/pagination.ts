@@ -15,6 +15,22 @@ interface State {
 }
 
 export class Pagination extends Component<PaginationProperties, State> {
+  private abortController: AbortController | null = null;
+
+  private readonly buttonNext = new Button({
+    onClick: (): void => {
+      this.goTo(this.state.page + 1);
+    },
+    textContent: '>',
+  });
+
+  private readonly buttonPrevious = new Button({
+    onClick: (): void => {
+      this.goTo(this.state.page - 1);
+    },
+    textContent: '<',
+  });
+
   public constructor(properties: PaginationProperties) {
     super(properties);
 
@@ -23,35 +39,36 @@ export class Pagination extends Component<PaginationProperties, State> {
     this.className = styles.container;
   }
 
+  public getAbortSignal(): AbortSignal {
+    this.abortController ??= new AbortController();
+
+    return this.abortController.signal;
+  }
+
   public render(): DocumentFragment | HTMLElement {
     const { page, totalPages } = this.state;
 
-    const isFirst = page <= 1;
-    const isLast = page >= totalPages;
+    this.abortController?.abort();
+    this.abortController = null;
 
-    const buttonPrevious = new Button({
-      onClick: (): void => {
-        this.goTo(page - 1);
-      },
-      textContent: '<',
-    });
+    this.abortController = new AbortController();
 
-    buttonPrevious.toggleDisabled(isFirst);
+    this.initializeButtonListeners();
 
-    const buttonNext = new Button({
-      onClick: (): void => {
-        this.goTo(page + 1);
-      },
-      textContent: '>',
-    });
-
-    buttonNext.toggleDisabled(isLast);
+    this.setButtonsState({ next: page >= totalPages, previous: page <= 1 });
 
     return createFragment(
-      buttonPrevious,
+      this.buttonPrevious,
       div({ className: styles.info }, `${page.toString()} / ${totalPages.toString()}`),
-      buttonNext
+      this.buttonNext
     );
+  }
+
+  public setButtonsState(options: { next?: boolean; previous?: boolean }): void {
+    const defaultValue = false;
+
+    this.buttonNext.toggleDisabled(options.next ?? defaultValue);
+    this.buttonPrevious.toggleDisabled(options.previous ?? defaultValue);
   }
 
   private goTo(page: number): void {
@@ -60,6 +77,25 @@ export class Pagination extends Component<PaginationProperties, State> {
     }
 
     this.props.onPageChange(page);
+  }
+
+  private initializeButtonListeners(): void {
+    this.buttonPrevious.addEventListener(
+      'click',
+      () => {
+        this.goTo(this.state.page - 1);
+      },
+      { signal: this.getAbortSignal() }
+    );
+
+    this.buttonNext.addEventListener(
+      'click',
+      () => {
+        this.goTo(this.state.page + 1);
+      },
+
+      { signal: this.getAbortSignal() }
+    );
   }
 }
 
