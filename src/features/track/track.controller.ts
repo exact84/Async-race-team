@@ -48,6 +48,8 @@ export class TrackController {
     this.winnersService = winnersService;
 
     this.emitter = emitter;
+
+    this.setupEmitterHandlers();
   }
 
   public deinitialize(): void {
@@ -62,14 +64,6 @@ export class TrackController {
 
   public getView(): HTMLElement {
     return this.view;
-  }
-
-  public async initialize(): Promise<void> {
-    this.setupListeners();
-
-    const cars = await this.garageService.getAll();
-
-    this.updateView(cars);
   }
 
   public async startRace(): Promise<void> {
@@ -118,6 +112,24 @@ export class TrackController {
     }
   }
 
+  public updateView(cars: Car[]): void {
+    this.carControllers = cars.map((car) => {
+      const controller = new CarController(
+        new CarView({ car, emitter: this.emitter }),
+        this.engineService,
+        this.garageService
+      );
+
+      controller.setOnSingleStart((id) => {
+        this.singleStartedEngines.add(id);
+      });
+
+      return controller;
+    });
+
+    this.view.setState({ carControllers: this.carControllers });
+  }
+
   private driveAllCars(
     startTime: number,
     signal: AbortSignal
@@ -139,7 +151,7 @@ export class TrackController {
     return new AbortController();
   }
 
-  private setupListeners(): void {
+  private setupEmitterHandlers(): void {
     if (!this.emitter) {
       return;
     }
@@ -157,21 +169,17 @@ export class TrackController {
     });
 
     const unsubscribeCreateHundred = this.emitter.on('garage:create-hundred', () => {
-      Promise.all([this.garageService.createRandomCars(), this.garageService.getAll()])
-        .then((data) => {
-          this.updateView(data[1]);
-          this.emitter?.emit('garage:created-hundred');
-        })
-        .catch(console.warn);
+      this.garageService.createRandomCars().then(
+        () => this.emitter?.emit('garage:created-hundred'),
+        () => null
+      );
     });
 
     const unsubscribeCreateOne = this.emitter.on('garage:create-one', (payload) => {
-      Promise.all([this.garageService.create(payload), this.garageService.getAll()])
-        .then((data) => {
-          this.updateView(data[1]);
-          this.emitter?.emit('garage:created-one');
-        })
-        .catch(console.warn);
+      this.garageService.create(payload).then(
+        () => this.emitter?.emit('garage:created-one'),
+        () => null
+      );
     });
 
     this.unsubscribeFunctions
@@ -207,24 +215,6 @@ export class TrackController {
     await Promise.all(stopPromises);
 
     this.singleStartedEngines.clear();
-  }
-
-  private updateView(cars: Car[]): void {
-    this.carControllers = cars.map((car) => {
-      const controller = new CarController(
-        new CarView({ car, emitter: this.emitter }),
-        this.engineService,
-        this.garageService
-      );
-
-      controller.setOnSingleStart((id) => {
-        this.singleStartedEngines.add(id);
-      });
-
-      return controller;
-    });
-
-    this.view.setState({ carControllers: this.carControllers });
   }
 }
 
