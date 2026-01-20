@@ -1,7 +1,9 @@
 import { div } from '@ripetchor/dom';
 
+import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { DriveMetrics, DriveResult } from '../../services/engine-service/types';
 import type { Car } from '../../services/garage-service/types';
+import type { Emitter } from '../../shared/event-emitter/event-emitter';
 
 import { Button } from '../../components/button/button';
 import { CarImage } from '../../components/car-image/car-image';
@@ -24,7 +26,12 @@ interface State {
 
 const CROSS_LINE_WIDTH = 20;
 
-export class CarView extends Component<Car, State> {
+interface CarViewProperties {
+  car: Car;
+  emitter: Emitter<GaragePageEvents> | null;
+}
+
+export class CarView extends Component<CarViewProperties, State> {
   private abortController: AbortController | null = null;
 
   private animation: Animation | null = null;
@@ -55,20 +62,28 @@ export class CarView extends Component<Car, State> {
 
   private driveMetrics: DriveMetrics | null = null;
 
-  public constructor(properties: Car) {
+  private readonly unsubscribeFunctions = new Set<VoidFunction>();
+
+  public constructor(properties: CarViewProperties) {
     super(properties);
 
-    this.state = { color: this.props.color, name: this.props.name };
+    this.state = { color: this.props.car.color, name: this.props.car.name };
 
     this.className = styles.container;
 
     this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+
+    this.setupListeners();
   }
 
   public getAbortSignal(): AbortSignal {
     this.abortController ??= new AbortController();
 
     return this.abortController.signal;
+  }
+
+  public getCarData(): Car {
+    return this.props.car;
   }
 
   public pauseAnimation(): void {
@@ -171,6 +186,12 @@ export class CarView extends Component<Car, State> {
   protected disconnectedCallback(): void {
     this.abortController?.abort();
     this.abortController = null;
+
+    for (const unsubscribe of this.unsubscribeFunctions) {
+      unsubscribe();
+    }
+
+    this.unsubscribeFunctions.clear();
   }
 
   private initializeButtonListeners(): void {
@@ -258,6 +279,14 @@ export class CarView extends Component<Car, State> {
     } finally {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
+  }
+
+  private setupListeners(): void {
+    this.props.emitter?.on('race:start', () => {
+      requestIdleCallback(() => {
+        this.setButtonsState({ delete: true, start: true, stop: true, update: true });
+      });
+    });
   }
 }
 

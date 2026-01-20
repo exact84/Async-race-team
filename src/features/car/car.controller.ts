@@ -4,6 +4,8 @@ import type { GarageService } from '../../services/garage-service/garage.service
 import type { Car } from '../../services/garage-service/types';
 import type { CarView } from './car.view';
 
+type SingleStartCallback = (id: number) => void;
+
 export class CarController {
   private readonly carId: number;
 
@@ -13,6 +15,8 @@ export class CarController {
 
   private readonly garageService: GarageService;
 
+  private onSingleStart: null | SingleStartCallback = null;
+
   private readonly view: CarView;
 
   public constructor(view: CarView, engineService: EngineService, garageService: GarageService) {
@@ -20,7 +24,7 @@ export class CarController {
     this.engineService = engineService;
     this.garageService = garageService;
 
-    this.carId = view.getProps().id;
+    this.carId = view.getCarData().id;
 
     this.view.setCallbacks({
       onDelete: () => this.delete(),
@@ -31,7 +35,7 @@ export class CarController {
   }
 
   public delete(): Promise<object> {
-    return this.garageService.delete(this.carId, this.driveAbortController?.signal);
+    return this.garageService.delete(this.carId);
   }
 
   public disableButtons(): void {
@@ -43,7 +47,7 @@ export class CarController {
 
     return this.engineService
       .drive(this.carId, signal)
-      .then((result) => ({ ...this.view.getProps(), success: result.success }));
+      .then((result) => ({ ...this.view.getCarData(), success: result.success }));
   }
 
   public enableButtons(): void {
@@ -62,8 +66,14 @@ export class CarController {
     this.view.pauseAnimation();
   }
 
+  public setOnSingleStart(callback: SingleStartCallback): void {
+    this.onSingleStart = callback;
+  }
+
   public startAndDrive(parentSignal: AbortSignal): Promise<DriveResult> {
     const signal = this.recreateDriveAbortController(parentSignal);
+
+    this.onSingleStart?.(this.carId);
 
     return this.startEngine(signal).then(() => {
       this.startAnimation();
@@ -107,7 +117,7 @@ export class CarController {
   }
 
   public update(data: Omit<Car, 'id'>): Promise<Car> {
-    return this.garageService.update(this.carId, data, this.driveAbortController?.signal);
+    return this.garageService.update(this.carId, data);
   }
 
   private recreateDriveAbortController(parentSignal: AbortSignal): AbortSignal {
