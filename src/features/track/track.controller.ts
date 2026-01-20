@@ -144,7 +144,7 @@ export class TrackController {
       return;
     }
 
-    const unusbscribeStartRace = this.emitter.on('race:start', () => {
+    const unsubscribeStartRace = this.emitter.on('race:start', () => {
       for (const controller of this.carControllers) {
         controller.disableButtons();
       }
@@ -165,7 +165,7 @@ export class TrackController {
         .catch(console.warn);
     });
 
-    const unssubscribeCreateOne = this.emitter.on('garage:create-one', (payload) => {
+    const unsubscribeCreateOne = this.emitter.on('garage:create-one', (payload) => {
       Promise.all([this.garageService.create(payload), this.garageService.getAll()])
         .then((data) => {
           this.updateView(data[1]);
@@ -175,10 +175,10 @@ export class TrackController {
     });
 
     this.unsubscribeFunctions
-      .add(unusbscribeStartRace)
+      .add(unsubscribeStartRace)
       .add(unsubscribeStopRace)
       .add(unsubscribeCreateHundred)
-      .add(unssubscribeCreateOne);
+      .add(unsubscribeCreateOne);
   }
 
   private async startAllEngines(signal: AbortSignal): Promise<void> {

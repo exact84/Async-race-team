@@ -62,7 +62,7 @@ export class CarView extends Component<CarViewProperties, State> {
 
   private driveMetrics: DriveMetrics | null = null;
 
-  private readonly unusbscribeFunctions = new Set<VoidFunction>();
+  private readonly unsubscribeFunctions = new Set<VoidFunction>();
 
   public constructor(properties: CarViewProperties) {
     super(properties);
@@ -187,11 +187,11 @@ export class CarView extends Component<CarViewProperties, State> {
     this.abortController?.abort();
     this.abortController = null;
 
-    for (const unsubscribe of this.unusbscribeFunctions) {
+    for (const unsubscribe of this.unsubscribeFunctions) {
       unsubscribe();
     }
 
-    this.unusbscribeFunctions.clear();
+    this.unsubscribeFunctions.clear();
   }
 
   private initializeButtonListeners(): void {
