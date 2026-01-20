@@ -1,4 +1,3 @@
-/* eslint-disable perfectionist/sort-classes */
 import { div, h1 } from '@ripetchor/dom';
 
 import type { SortField, SortOrder } from '../../services/winners-service/types';
