@@ -1,10 +1,10 @@
 /* eslint-disable perfectionist/sort-interfaces */
-import { caption, table, tbody, td, th, thead, tr } from '@ripetchor/dom';
+import { caption, span, table, tbody, td, th, thead, tr } from '@ripetchor/dom';
 
 import type { SortOrder } from '../../services/winners-service/types';
 
 import { Component, defineElement } from '../../shared/component/component';
-import { prettyHeader } from './helper';
+import { prettifyHeader } from './helper';
 import styles from './table.module.css';
 
 export interface TableCell {
@@ -62,17 +62,21 @@ export class Table extends Component<TableProperties> {
 
   private createThead(): HTMLElement {
     return thead(
-      { className: styles.thead },
+      { className: this.props.stickyHeader ? `${styles.thead} ${styles.sticky}` : styles.thead },
       ...this.props.headers.map((header) =>
         th(
           {
-            className: styles.th,
+            className: header.sortable ? `${styles.th} ${styles.sortable}` : styles.th,
             click: () => {
               if (!header.sortable) return;
               this.props.onSort?.(header.key);
             },
           },
-          `${prettyHeader(header.key)}${header.sortable && header.sorted ? (header.sorted === 'ASC' ? ' ↑' : ' ↓') : ''}`
+          prettifyHeader(header.key),
+          span(
+            { className: styles.span_sortable },
+            header.sortable ? (header.sorted ? (header.sorted === 'ASC' ? ' ↑' : ' ↓') : ' ↕') : ''
+          )
         )
       )
     );

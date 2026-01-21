@@ -12,7 +12,6 @@
 
 .thead {
   background-color: var(--bg-color);
-  filter: brightness(150%);
 }
 
 .thead.sticky {
@@ -21,13 +20,22 @@
   top: 0;
 }
 
+.span_sortable {
+  font-size: x-large;
+  font-weight: 900;
+}
+
+.sortable {
+  cursor: pointer;
+}
+
 .th,
 .td {
   overflow: hidden;
 
   width: calc(100% / 5);
   padding: 8px 12px;
-  border: 1px solid var(--fg-color);
+  border: 2px solid var(--fg-color);
 
   text-align: left;
   text-overflow: ellipsis;
@@ -35,13 +43,14 @@
 }
 
 .tr {
-  background-color: var(--bg-color);
+  color: var(--table-color-even);
+  background-color: var(--table-color-odd);
   transition: background-color var(--transition-duration) ease-in-out;
 }
 
 .tr:nth-child(even) {
-  background-color: var(--bg-color);
-  filter: brightness(70%);
+  color: var(--table-color-odd);
+  background-color: var(--table-color-even);
 }
 
 .td:nth-child(3) {

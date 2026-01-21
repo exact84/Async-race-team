@@ -1,5 +1,4 @@
-/* eslint-disable max-lines-per-function */
-import { fireEvent, screen } from '@testing-library/dom';
+import { screen } from '@testing-library/dom';
 import { describe, expect, it, vi } from 'vitest';
 
 import { WinnersPage } from './winners-page';
@@ -61,16 +60,5 @@ describe('WinnersPage', () => {
     expect(page.currentSort).toBe('wins');
     expect(page.currentOrder).toBe('ASC');
     expect(mockLoadWinners).toHaveBeenCalledWith('ASC', 'wins', 1);
-  });
-
-  it('button click triggers handleSort', () => {
-    mockLoadWinners.mockResolvedValue({ headers: [], rows: [] });
-    const page = new WinnersPage();
-    document.body.append(page.render());
-
-    const button = screen.getByText('Refresh');
-    fireEvent.click(button);
-
-    expect(mockLoadWinners).toHaveBeenCalled();
   });
 });

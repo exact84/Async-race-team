@@ -70,14 +70,14 @@ describe('Table sorting', () => {
       records: [{ cells: [{ kind: 'text', value: '42' }] }],
     });
 
-    expect(screen.getByText(/Wins ↑/)).toBeInTheDocument();
+    expect(screen.getByText(/↑/)).toBeInTheDocument();
   });
   it('renders ↓ when header.sorted is DESC', () => {
     renderTable({
       headers: [{ key: 'score', sortable: true, sorted: 'DESC' }],
       records: [{ cells: [{ kind: 'text', value: '42' }] }],
     });
-    expect(screen.getByText(/Score ↓/)).toBeInTheDocument();
+    expect(screen.getByText(/↓/)).toBeInTheDocument();
   });
 });
 
