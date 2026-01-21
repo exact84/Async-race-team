@@ -57,18 +57,6 @@ it('should call onDelete callback when Delete button is clicked', async () => {
   expect(mockCallbacks.onDelete).toBeCalled();
 });
 
-it('should call onUpdate callback when Update button is clicked', async () => {
-  const user = userEvent.setup();
-  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
-
-  view.setCallbacks(mockCallbacks);
-
-  const buttonUpdate = getByTestId(view, 'button-update');
-  await user.click(buttonUpdate);
-
-  expect(mockCallbacks.onUpdate).toBeCalled();
-});
-
 it('Stop button should be disabled initially', () => {
   const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
 
@@ -168,21 +156,6 @@ it('onDeleteButtonClick should restore buttons on error', async () => {
   await user.click(buttonDelete);
 
   expect(buttonDelete).not.toBeDisabled();
-});
-
-it('onUpdateButtonClick should update name and color', async () => {
-  const user = userEvent.setup();
-  const view = render(() => new CarView({ car: MOCK_SINGLE_CAR, emitter: null }));
-
-  view.setCallbacks({
-    ...mockCallbacks,
-    onUpdate: vi.fn().mockResolvedValue({ color: 'red', id: 1, name: 'Updated' }),
-  });
-
-  const buttonUpdate = getByTestId(view, 'button-update');
-  await user.click(buttonUpdate);
-
-  expect(view.textContent).toContain('Updated');
 });
 
 it('disconnectedCallback should abort internal AbortController', () => {

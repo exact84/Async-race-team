@@ -1,0 +1,25 @@
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+
+  max-width: 500px;
+  margin-inline: auto;
+  padding: 10px; /* TODO: remove if modal will have own */
+  border: 2px solid var(--accent-color); /* TODO: remove if modal will have own */
+  border-radius: 5px;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: center;
+}
+
+.input {
+  padding: 5px;
+  font-size: inherit;
+}

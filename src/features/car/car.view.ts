@@ -6,8 +6,8 @@ import type { Car } from '../../services/garage-service/types';
 import type { Emitter } from '../../shared/event-emitter/event-emitter';
 
 import { Button } from '../../components/button/button';
+import { CarForm } from '../../components/car-form/car-form';
 import { CarImage } from '../../components/car-image/car-image';
-import { createRandomCar } from '../../services/garage-service/utilities';
 import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
 import styles from './car.view.module.css';
@@ -83,7 +83,7 @@ export class CarView extends Component<CarViewProperties, State> {
   }
 
   public getCarData(): Car {
-    return this.props.car;
+    return { color: this.state.color, id: this.props.car.id, name: this.state.name };
   }
 
   public pauseAnimation(): void {
@@ -222,7 +222,7 @@ export class CarView extends Component<CarViewProperties, State> {
     this.buttonUpdate.addEventListener(
       'click',
       () => {
-        void this.onUpdateButtonClick();
+        this.onUpdateButtonClick();
       },
       { signal: this.getAbortSignal() }
     );
@@ -264,21 +264,33 @@ export class CarView extends Component<CarViewProperties, State> {
     }
   }
 
-  private async onUpdateButtonClick(): Promise<void> {
+  private onUpdateButtonClick(): void {
     this.setButtonsState({ delete: true, start: true, stop: true, update: true });
 
-    try {
-      // TODO: replace by modal and form
-      const car = await this.callbacks?.onUpdate(createRandomCar());
+    const { id } = this.getCarData();
+    const { color, name } = this.state;
 
-      if (!car) {
-        return;
-      }
+    const carForm = new CarForm({
+      color,
+      id,
+      mode: 'update',
+      name,
+      onSubmit: (carData): void => {
+        this.callbacks
+          ?.onUpdate({ color: carData.color, name: carData.name })
+          .then(() => {
+            this.setState({ color: carData.color, name: carData.name });
+          })
+          .catch(() => null)
+          .finally(() => {
+            carForm.remove();
+            this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+          });
+      },
+    });
 
-      this.setState({ color: car.color, name: car.name });
-    } finally {
-      this.setButtonsState({ delete: false, start: false, stop: true, update: false });
-    }
+    // TODO: replace by modal
+    this.append(carForm);
   }
 
   private setupListeners(): void {
