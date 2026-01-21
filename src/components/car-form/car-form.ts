@@ -35,6 +35,12 @@ export class CarForm extends Component<CarFormProperties> {
     type: 'color',
   });
 
+  private readonly labelColor = label(
+    { className: styles.label, htmlFor: 'car-color' },
+    'Color',
+    this.inputColor
+  );
+
   private readonly inputName = input({
     autofocus: true,
     className: styles.input,
@@ -45,12 +51,6 @@ export class CarForm extends Component<CarFormProperties> {
     signal: this.abortController.signal,
     type: 'text',
   });
-
-  private readonly labelColor = label(
-    { className: styles.label, htmlFor: 'car-color' },
-    'Color',
-    this.inputColor
-  );
 
   private readonly labelName = label(
     { className: styles.label, htmlFor: 'car-name' },
@@ -63,15 +63,7 @@ export class CarForm extends Component<CarFormProperties> {
       className: styles.form,
       signal: this.abortController.signal,
       submit: (event) => {
-        event.preventDefault();
-
-        const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
-
-        this.props.onSubmit({
-          color: this.inputColor.value,
-          id,
-          name: this.inputName.value.trim(),
-        });
+        this.handleSubmit(event);
       },
     },
     this.labelName,
@@ -104,6 +96,14 @@ export class CarForm extends Component<CarFormProperties> {
 
   protected disconnectedCallback(): void {
     this.abortController.abort();
+  }
+
+  private handleSubmit(event: SubmitEvent): void {
+    event.preventDefault();
+
+    const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
+
+    this.props.onSubmit({ color: this.inputColor.value, id, name: this.inputName.value.trim() });
   }
 
   private updateSubmitButtonState(): void {
