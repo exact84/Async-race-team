@@ -21,6 +21,7 @@ export class Pagination extends Component<PaginationProperties, State> {
     onClick: (): void => {
       this.goTo(this.state.page + 1);
     },
+    testid: 'button-next',
     textContent: '>',
   });
 
@@ -28,6 +29,7 @@ export class Pagination extends Component<PaginationProperties, State> {
     onClick: (): void => {
       this.goTo(this.state.page - 1);
     },
+    testid: 'button-previous',
     textContent: '<',
   });
 
@@ -59,7 +61,10 @@ export class Pagination extends Component<PaginationProperties, State> {
 
     return createFragment(
       this.buttonPrevious,
-      div({ className: styles.info }, `${page.toString()} / ${totalPages.toString()}`),
+      div(
+        { 'className': styles.info, 'data-testid': 'info' },
+        `${page.toString()} / ${totalPages.toString()}`
+      ),
       this.buttonNext
     );
   }
