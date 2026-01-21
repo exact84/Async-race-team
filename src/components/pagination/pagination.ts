@@ -57,7 +57,7 @@ export class Pagination extends Component<PaginationProperties, State> {
 
     this.initializeButtonListeners();
 
-    this.setButtonsState({ next: page >= totalPages, previous: page <= 1 });
+    this.setButtonsState();
 
     return createFragment(
       this.buttonPrevious,
@@ -69,11 +69,18 @@ export class Pagination extends Component<PaginationProperties, State> {
     );
   }
 
-  public setButtonsState(options: { next?: boolean; previous?: boolean }): void {
-    const defaultValue = false;
+  public setButtonsState(options?: { next?: boolean; previous?: boolean }): void {
+    const { page, totalPages } = this.state;
 
-    this.buttonNext.toggleDisabled(options.next ?? defaultValue);
-    this.buttonPrevious.toggleDisabled(options.previous ?? defaultValue);
+    const stateNextDisabled = page >= totalPages;
+    const statePreviousDisabled = page <= 1;
+
+    const nextDisabled = stateNextDisabled || options?.next === true;
+
+    const previousDisabled = statePreviousDisabled || options?.previous === true;
+
+    this.buttonNext.toggleDisabled(nextDisabled);
+    this.buttonPrevious.toggleDisabled(previousDisabled);
   }
 
   private goTo(page: number): void {

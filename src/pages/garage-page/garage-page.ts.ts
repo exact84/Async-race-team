@@ -84,6 +84,14 @@ export class GaragePage extends Component {
   }
 
   private setupEmitterHandlers(): void {
+    const unsubscribeRaceStart = garageEmitter.on('race:start', () => {
+      this.pagination.setButtonsState({ next: true, previous: true });
+    });
+
+    const unsubscribeRaceStopped = garageEmitter.on('race:stop', () => {
+      this.pagination.setButtonsState({ next: false, previous: false });
+    });
+
     const unsubscribeCreatedOne = garageEmitter.on('garage:created-one', () => {
       this.setTotalCount();
     });
@@ -92,7 +100,11 @@ export class GaragePage extends Component {
       this.setTotalCount();
     });
 
-    this.unsubscribeFunctions.add(unsubscribeCreatedOne).add(unsubscribeCreatedHundred);
+    this.unsubscribeFunctions
+      .add(unsubscribeRaceStart)
+      .add(unsubscribeRaceStopped)
+      .add(unsubscribeCreatedOne)
+      .add(unsubscribeCreatedHundred);
   }
 
   private setupStoreSubscriptions(): void {
