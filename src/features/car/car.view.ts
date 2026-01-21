@@ -83,7 +83,7 @@ export class CarView extends Component<CarViewProperties, State> {
   }
 
   public getCarData(): Car {
-    return this.props.car;
+    return { color: this.state.color, id: this.props.car.id, name: this.state.name };
   }
 
   public pauseAnimation(): void {
