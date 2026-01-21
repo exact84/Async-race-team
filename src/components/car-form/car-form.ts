@@ -20,6 +20,8 @@ type FormSubmitCallback = (car: Car) => void;
 type UpdateFormProperties = Car & { mode: 'update'; onSubmit: FormSubmitCallback };
 
 export class CarForm extends Component<CarFormProperties> {
+  private readonly abortController = new AbortController();
+
   private readonly buttonSubmit = new Button({ textContent: 'Submit' });
 
   private readonly carImage = new CarImage({ color: 'white', size: 'lg' });
@@ -29,6 +31,7 @@ export class CarForm extends Component<CarFormProperties> {
       this.carImage.setColor(event.currentTarget.value);
     },
     id: 'car-color',
+    signal: this.abortController.signal,
     type: 'color',
   });
 
@@ -39,6 +42,7 @@ export class CarForm extends Component<CarFormProperties> {
     input: () => {
       this.updateSubmitButtonState();
     },
+    signal: this.abortController.signal,
     type: 'text',
   });
 
@@ -57,6 +61,7 @@ export class CarForm extends Component<CarFormProperties> {
   private readonly formElement = form(
     {
       className: styles.form,
+      signal: this.abortController.signal,
       submit: (event) => {
         event.preventDefault();
 
@@ -95,6 +100,10 @@ export class CarForm extends Component<CarFormProperties> {
 
   public render(): DocumentFragment | HTMLElement {
     return this.formElement;
+  }
+
+  protected disconnectedCallback(): void {
+    this.abortController.abort();
   }
 
   private updateSubmitButtonState(): void {
