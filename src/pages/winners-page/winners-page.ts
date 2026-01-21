@@ -4,17 +4,17 @@ import type { SortField, SortOrder } from '../../services/winners-service/types'
 
 import { Button } from '../../components/button/button';
 import { Table } from '../../components/table/table';
+import { TableController } from '../../components/table/table.controller';
 import {
-  DEFAULT_LIMIT,
   DEFAULT_SORT_FIELD,
-  WinnersPageController,
-} from '../../components/table/table.controller';
+  DEFAULT_SORT_ORDER,
+} from '../../services/winners-service/winners.service';
 import { Component, defineElement } from '../../shared/component/component';
 
 export class WinnersPage extends Component {
-  private currentOrder: SortOrder = 'ASC';
+  public currentOrder: SortOrder = 'ASC';
 
-  private currentSort: SortField = DEFAULT_SORT_FIELD;
+  public currentSort: SortField = DEFAULT_SORT_FIELD;
 
   private table = new Table({
     fallbackMessage: 'Loading...',
@@ -23,38 +23,19 @@ export class WinnersPage extends Component {
     testid: 'winners-table',
   });
 
-  private winnersPageController = new WinnersPageController();
+  private tableController = new TableController();
 
   public connectedCallback(): void {
     super.connectedCallback();
     void this.getData();
   }
 
-  public render(): HTMLElement {
-    const button = new Button({
-      buttonSize: 'md',
-      onClick: (): void => {
-        console.warn('Button clicked!');
-      },
-      onToggle: (): void => {
-        console.warn('Button toggled!');
-      },
-      textContent: 'Return to Garage',
-    });
-    return div({ className: 'page' }, h1(null, 'Winners page'), this.table, button);
-  }
-
-  private async getData(
+  public async getData(
     sort: SortField = DEFAULT_SORT_FIELD,
-    order: SortOrder = 'ASC'
+    order: SortOrder = DEFAULT_SORT_ORDER
   ): Promise<void> {
     try {
-      const { headers, rows } = await this.winnersPageController.loadWinners(
-        DEFAULT_LIMIT,
-        order,
-        1,
-        sort
-      );
+      const { headers, rows } = await this.tableController.loadWinners(order, sort, 1);
       this.table = new Table({
         fallbackMessage: 'No winners yet',
         headers: headers,
@@ -69,19 +50,28 @@ export class WinnersPage extends Component {
       // Replace with Toast
       console.error('Failed to load winners:', error);
     }
-
     this.setState({});
   }
 
-  private async handleSort(field: SortField): Promise<void> {
+  public async handleSort(field: SortField): Promise<void> {
     if (this.currentSort === field) {
       this.currentOrder = this.currentOrder === 'ASC' ? 'DESC' : 'ASC';
     } else {
       this.currentSort = field;
     }
-    console.warn('Sorting by:', this.currentSort, this.currentOrder);
 
     await this.getData(this.currentSort, this.currentOrder);
+  }
+
+  public render(): HTMLElement {
+    const button = new Button({
+      buttonSize: 'md',
+      onClick: (): void => {
+        void this.handleSort('wins');
+      },
+      textContent: 'Refresh',
+    });
+    return div({ className: 'page' }, h1(null, 'Winners page'), this.table, button);
   }
 }
 

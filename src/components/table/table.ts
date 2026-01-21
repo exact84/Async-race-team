@@ -1,19 +1,36 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable perfectionist/sort-interfaces */
 import { caption, table, tbody, td, th, thead, tr } from '@ripetchor/dom';
 
-import type { TableRecord } from './table.controller';
+import type { SortOrder } from '../../services/winners-service/types';
 
 import { Component, defineElement } from '../../shared/component/component';
+import { prettyHeader } from './helper';
 import styles from './table.module.css';
 
+export interface TableCell {
+  kind: 'img' | 'text';
+  meta?: { className?: string; color?: string; size?: 'lg' | 'md' | 'sm'; tooltip?: string };
+  value: HTMLElement | number | string;
+}
+
+export interface TableHeader {
+  key: string;
+  sortable: boolean;
+  sorted?: SortOrder;
+}
 export interface TableProperties {
   onClick?(): void;
   onSort?(field: string): void;
   stickyHeader?: boolean;
   testid: string;
-  headers: string[];
+  headers: TableHeader[];
   records: TableRecord[];
   fallbackMessage?: string;
+}
+
+export interface TableRecord {
+  cells: TableCell[];
 }
 
 export class Table extends Component<TableProperties> {
@@ -23,7 +40,6 @@ export class Table extends Component<TableProperties> {
     return table(
       {
         'className': styles.table,
-        'click': () => this.props.onClick?.(),
         'data-testid': this.props.testid,
         'signal': this.abortController.signal,
       },
@@ -36,7 +52,16 @@ export class Table extends Component<TableProperties> {
                   : styles.thead,
               },
               ...this.props.headers.map((header) =>
-                th({ className: styles.th, click: () => this.props.onSort?.(header) }, header)
+                th(
+                  {
+                    className: styles.th,
+                    click: () => {
+                      if (!header.sortable) return;
+                      this.props.onSort?.(header.key);
+                    },
+                  },
+                  `${prettyHeader(header.key)}${header.sortable && header.sorted ? (header.sorted === 'ASC' ? ' ↑' : ' ↓') : ''}`
+                )
               )
             ),
             tbody(
@@ -44,7 +69,9 @@ export class Table extends Component<TableProperties> {
               ...this.props.records.map((record) =>
                 tr(
                   { className: styles.tr },
-                  ...record.cells.map((cell) => td({ className: styles.td }, cell.value))
+                  ...record.cells.map((cell) =>
+                    td({ className: styles.td, title: cell.meta?.tooltip }, cell.value)
+                  )
                 )
               )
             ),
