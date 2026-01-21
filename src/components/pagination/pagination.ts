@@ -17,21 +17,9 @@ interface State {
 export class Pagination extends Component<PaginationProperties, State> {
   private abortController: AbortController | null = null;
 
-  private readonly buttonNext = new Button({
-    onClick: (): void => {
-      this.goTo(this.state.page + 1);
-    },
-    testid: 'button-next',
-    textContent: '>',
-  });
+  private readonly buttonNext = new Button({ testid: 'button-next', textContent: '>' });
 
-  private readonly buttonPrevious = new Button({
-    onClick: (): void => {
-      this.goTo(this.state.page - 1);
-    },
-    testid: 'button-previous',
-    textContent: '<',
-  });
+  private readonly buttonPrevious = new Button({ testid: 'button-previous', textContent: '<' });
 
   public constructor(properties: PaginationProperties) {
     super(properties);
