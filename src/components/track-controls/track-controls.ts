@@ -5,6 +5,7 @@ import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
 import { Button } from '../button/button';
 import { CarForm } from '../car-form/car-form';
+import { Modal } from '../modal/modal';
 import styles from './track-controls.module.css';
 
 export interface TrackControlProperties {
@@ -22,6 +23,8 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   private readonly buttonCreateOne = new Button({
     onClick: (): void => {
+      const modal = new Modal();
+
       const carForm = new CarForm({
         mode: 'create',
         onSubmit: (data): void => {
@@ -31,8 +34,7 @@ export class TrackControls extends Component<TrackControlProperties> {
         },
       });
 
-      // TODO: replace by modal
-      this.append(carForm);
+      modal.open(() => carForm);
     },
     testid: 'button-track-create-1',
     textContent: 'Create car',
