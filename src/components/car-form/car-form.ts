@@ -36,6 +36,9 @@ export class CarForm extends Component<CarFormProperties> {
     autofocus: true,
     className: styles.input,
     id: 'car-name',
+    input: () => {
+      this.updateSubmitButtonState();
+    },
     type: 'text',
   });
 
@@ -59,7 +62,11 @@ export class CarForm extends Component<CarFormProperties> {
 
         const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
 
-        this.props.onSubmit({ color: this.inputColor.value, id, name: this.inputName.value });
+        this.props.onSubmit({
+          color: this.inputColor.value,
+          id,
+          name: this.inputName.value.trim(),
+        });
       },
     },
     this.labelName,
@@ -88,6 +95,12 @@ export class CarForm extends Component<CarFormProperties> {
 
   public render(): DocumentFragment | HTMLElement {
     return this.formElement;
+  }
+
+  private updateSubmitButtonState(): void {
+    const isDisabled = this.inputName.value.trim().length === 0;
+
+    this.buttonSubmit.toggleDisabled(isDisabled);
   }
 }
 
