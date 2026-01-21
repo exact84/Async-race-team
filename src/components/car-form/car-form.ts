@@ -22,17 +22,21 @@ type UpdateFormProperties = Car & { mode: 'update'; onSubmit: FormSubmitCallback
 export class CarForm extends Component<CarFormProperties> {
   private readonly abortController = new AbortController();
 
-  private readonly buttonSubmit = new Button({ textContent: 'Submit' });
+  private readonly buttonSubmit = new Button({
+    testid: 'button-submit-car-form',
+    textContent: 'Submit',
+  });
 
   private readonly carImage = new CarImage({ color: 'white', size: 'lg' });
 
   private readonly inputColor = input({
-    change: (event) => {
+    'change': (event) => {
       this.carImage.setColor(event.currentTarget.value);
     },
-    id: 'car-color',
-    signal: this.abortController.signal,
-    type: 'color',
+    'data-testid': 'input-car-color',
+    'id': 'car-color',
+    'signal': this.abortController.signal,
+    'type': 'color',
   });
 
   private readonly labelColor = label(
@@ -42,14 +46,15 @@ export class CarForm extends Component<CarFormProperties> {
   );
 
   private readonly inputName = input({
-    autofocus: true,
-    className: styles.input,
-    id: 'car-name',
-    input: () => {
+    'autofocus': true,
+    'className': styles.input,
+    'data-testid': 'input-car-name',
+    'id': 'car-name',
+    'input': () => {
       this.updateSubmitButtonState();
     },
-    signal: this.abortController.signal,
-    type: 'text',
+    'signal': this.abortController.signal,
+    'type': 'text',
   });
 
   private readonly labelName = label(
@@ -60,9 +65,10 @@ export class CarForm extends Component<CarFormProperties> {
 
   private readonly formElement = form(
     {
-      className: styles.form,
-      signal: this.abortController.signal,
-      submit: (event) => {
+      'className': styles.form,
+      'data-testid': 'input-car-form',
+      'signal': this.abortController.signal,
+      'submit': (event) => {
         this.handleSubmit(event);
       },
     },
@@ -113,4 +119,4 @@ export class CarForm extends Component<CarFormProperties> {
   }
 }
 
-defineElement('car-from', CarForm);
+defineElement('car-form', CarForm);
