@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/dot-notation */
+import { MOCK_CARS_ARRAY } from '../../../__mocks__/data';
 import { serviceProvider } from '../../services/service-provider';
 import { TrackController } from './track.controller';
 import { TrackView } from './track.view';
@@ -22,21 +23,6 @@ it('returns correct view', () => {
   expect(controller.getView()).toBeInstanceOf(TrackView);
 });
 
-it('initialize calls garageService.getAll()', async () => {
-  const controller = new TrackController(
-    new TrackView(),
-    engineService,
-    garageService,
-    winnersService
-  );
-
-  const getAllSpy = vi.spyOn(garageService, 'getAll');
-
-  await controller.initialize();
-
-  expect(getAllSpy).toBeCalled();
-});
-
 it('startRace calls engineService and winnersService appropriately', async () => {
   const controller = new TrackController(
     new TrackView(),
@@ -45,7 +31,7 @@ it('startRace calls engineService and winnersService appropriately', async () =>
     winnersService
   );
 
-  await controller.initialize();
+  controller.updateView(MOCK_CARS_ARRAY);
 
   const carController = controller['carControllers'][0];
   const startEngineSpy = vi.spyOn(carController, 'startEngine');
@@ -67,7 +53,7 @@ it('startAllEngines starts engines and animations', async () => {
     winnersService
   );
 
-  await controller.initialize();
+  controller.updateView(MOCK_CARS_ARRAY);
 
   const carController = controller['carControllers'][0];
   const startEngineSpy = vi.spyOn(carController, 'startEngine');

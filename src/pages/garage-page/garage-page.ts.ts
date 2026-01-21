@@ -1,6 +1,8 @@
 import { div, h1, span } from '@ripetchor/dom';
 
 import { garageEmitter } from '../../app/garage-emitter/garage-emitter';
+import { garageStore } from '../../app/garage-store/garage-store';
+import { Pagination } from '../../components/pagination/pagination';
 import { TrackControls } from '../../components/track-controls/track-controls';
 import { TrackController } from '../../features/track/track.controller';
 import { TrackView } from '../../features/track/track.view';
@@ -11,7 +13,11 @@ const engineService = serviceProvider.engineService();
 const garageService = serviceProvider.garageService();
 const winnersService = serviceProvider.winnersService();
 
+const CARS_PER_PAGE = 7;
+
 export class GaragePage extends Component {
+  private readonly pagination: Pagination;
+
   private readonly totalCarsSpan = span(null);
 
   private readonly trackController: TrackController;
@@ -21,6 +27,12 @@ export class GaragePage extends Component {
   public constructor() {
     super();
 
+    this.pagination = new Pagination({
+      onPageChange: (currentPage): void => {
+        garageStore.setState({ currentPage });
+      },
+    });
+
     this.trackController = new TrackController(
       new TrackView(),
       engineService,
@@ -28,10 +40,6 @@ export class GaragePage extends Component {
       winnersService,
       garageEmitter
     );
-
-    this.trackController.initialize().catch(console.warn);
-
-    this.setupListeners();
   }
 
   public render(): HTMLElement {
@@ -40,13 +48,18 @@ export class GaragePage extends Component {
     return div(
       { className: 'page' },
       h1(null, 'Garage: ', this.totalCarsSpan),
+      this.pagination,
       trackControls,
       this.trackController.getView()
     );
   }
 
   protected override connectedCallback(): void {
-    this.updateTotalCarsCount();
+    this.setupStoreSubscriptions();
+
+    this.setupEmitterHandlers();
+
+    this.setTotalCount();
 
     super.connectedCallback();
   }
@@ -61,27 +74,62 @@ export class GaragePage extends Component {
     this.unsubscribeFunctions.clear();
   }
 
-  private setupListeners(): void {
+  private setTotalCount(): void {
+    garageService.getTotalCount().then(
+      (count) => {
+        garageStore.setState({ totalCount: Number.parseInt(count ?? '0') });
+      },
+      () => null
+    );
+  }
+
+  private setupEmitterHandlers(): void {
+    const unsubscribeRaceStart = garageEmitter.on('race:start', () => {
+      this.pagination.setButtonsState({ next: true, previous: true });
+    });
+
+    const unsubscribeRaceStopped = garageEmitter.on('race:stop', () => {
+      this.pagination.setButtonsState({ next: false, previous: false });
+    });
+
     const unsubscribeCreatedOne = garageEmitter.on('garage:created-one', () => {
-      this.updateTotalCarsCount();
+      this.setTotalCount();
     });
 
     const unsubscribeCreatedHundred = garageEmitter.on('garage:created-hundred', () => {
-      this.updateTotalCarsCount();
+      this.setTotalCount();
     });
 
-    this.unsubscribeFunctions.add(unsubscribeCreatedOne).add(unsubscribeCreatedHundred);
+    this.unsubscribeFunctions
+      .add(unsubscribeRaceStart)
+      .add(unsubscribeRaceStopped)
+      .add(unsubscribeCreatedOne)
+      .add(unsubscribeCreatedHundred);
   }
 
-  private updateTotalCarsCount(): void {
-    garageService.getTotalCount().then(
-      (count) => {
-        this.totalCarsSpan.textContent = count ?? '0';
-      },
-      () => {
-        console.warn('Failed to get cars count');
+  private setupStoreSubscriptions(): void {
+    const unsubscribe = garageStore.subscribe(
+      (state) => state,
+      ({ currentPage, totalCount }) => {
+        this.pagination.setState({
+          page: currentPage,
+          totalPages: Math.ceil(totalCount / CARS_PER_PAGE),
+        });
+
+        this.totalCarsSpan.textContent = totalCount.toString();
+
+        garageService.getAll({ page: currentPage }).then(
+          (cars) => {
+            this.trackController.updateView(cars);
+          },
+          () => {
+            this.trackController.updateView([]);
+          }
+        );
       }
     );
+
+    this.unsubscribeFunctions.add(unsubscribe);
   }
 }
 
