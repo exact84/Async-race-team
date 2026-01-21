@@ -1,4 +1,3 @@
-/* eslint-disable max-lines-per-function */
 /* eslint-disable perfectionist/sort-interfaces */
 import { caption, table, tbody, td, th, thead, tr } from '@ripetchor/dom';
 
@@ -44,39 +43,38 @@ export class Table extends Component<TableProperties> {
         'signal': this.abortController.signal,
       },
       ...(this.props.records.length > 0
-        ? [
-            thead(
-              {
-                className: this.props.stickyHeader
-                  ? `${styles.thead} ${styles.sticky}`
-                  : styles.thead,
-              },
-              ...this.props.headers.map((header) =>
-                th(
-                  {
-                    className: styles.th,
-                    click: () => {
-                      if (!header.sortable) return;
-                      this.props.onSort?.(header.key);
-                    },
-                  },
-                  `${prettyHeader(header.key)}${header.sortable && header.sorted ? (header.sorted === 'ASC' ? ' ↑' : ' ↓') : ''}`
-                )
-              )
-            ),
-            tbody(
-              { className: styles.tbody },
-              ...this.props.records.map((record) =>
-                tr(
-                  { className: styles.tr },
-                  ...record.cells.map((cell) =>
-                    td({ className: styles.td, title: cell.meta?.tooltip }, cell.value)
-                  )
-                )
-              )
-            ),
-          ]
+        ? [this.createThead(), this.createTbody()]
         : [caption({ className: styles.fallbackMessage }, this.props.fallbackMessage)])
+    );
+  }
+
+  private createTbody(): HTMLElement {
+    return tbody(
+      { className: styles.tbody },
+      ...this.props.records.map((record) =>
+        tr(
+          { className: styles.tr },
+          ...record.cells.map((cell) => td({ className: styles.td }, cell.value))
+        )
+      )
+    );
+  }
+
+  private createThead(): HTMLElement {
+    return thead(
+      { className: styles.thead },
+      ...this.props.headers.map((header) =>
+        th(
+          {
+            className: styles.th,
+            click: () => {
+              if (!header.sortable) return;
+              this.props.onSort?.(header.key);
+            },
+          },
+          `${prettyHeader(header.key)}${header.sortable && header.sorted ? (header.sorted === 'ASC' ? ' ↑' : ' ↓') : ''}`
+        )
+      )
     );
   }
 }

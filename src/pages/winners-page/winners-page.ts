@@ -2,7 +2,6 @@ import { div, h1 } from '@ripetchor/dom';
 
 import type { SortField, SortOrder } from '../../services/winners-service/types';
 
-import { Button } from '../../components/button/button';
 import { Table } from '../../components/table/table';
 import { TableController } from '../../components/table/table.controller';
 import {
@@ -64,14 +63,14 @@ export class WinnersPage extends Component {
   }
 
   public render(): HTMLElement {
-    const button = new Button({
-      buttonSize: 'md',
-      onClick: (): void => {
-        void this.handleSort('wins');
-      },
-      textContent: 'Refresh',
-    });
-    return div({ className: 'page' }, h1(null, 'Winners page'), this.table, button);
+    // const button = new Button({
+    //   buttonSize: 'md',
+    //   onClick: (): void => {
+    //     void this.handleSort('wins');
+    //   },
+    //   textContent: 'Refresh',
+    // });
+    return div({ className: 'page' }, h1(null, 'Winners page'), this.table);
   }
 }
 
