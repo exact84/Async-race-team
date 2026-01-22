@@ -9,8 +9,8 @@ import { isWinnerRecord, isWinnerRecordsArray } from './type-guards';
 
 const DEFAULT_LIMIT = 5;
 const DEFAULT_PAGE = 1;
-const DEFAULT_SORT_FIELD = 'id';
-const DEFAULT_SORT_ORDER = 'ASC';
+export const DEFAULT_SORT_FIELD = 'id';
+export const DEFAULT_SORT_ORDER = 'ASC';
 
 export class WinnersService {
   private static instance: null | WinnersService = null;

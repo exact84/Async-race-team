@@ -1,4 +1,6 @@
 :root {
+  --color-dark-gray: #333;
+  --color-light-gray: #aaa;
   --color-dark: #121212;
   --color-light: #eee;
   --color-green-light: #42b883;
@@ -14,6 +16,8 @@
   :root {
     --bg-color: var(--color-dark);
     --fg-color: var(--color-light);
+    --table-color-odd: var(--color-dark-gray);
+    --table-color-even: var(--color-light-gray);
     --accent-color: var(--color-green-dark);
     --accent-color-hover: var(--color-green-light);
   }
@@ -23,6 +27,8 @@
   :root {
     --bg-color: var(--color-light);
     --fg-color: var(--color-dark);
+    --table-color-odd: var(--color-light-gray);
+    --table-color-even: var(--color-dark-gray);
     --accent-color: var(--color-rebeccapurple);
     --accent-color-hover: var(--color-purple);
   }
@@ -31,6 +37,8 @@
 :root[data-theme='dark'] {
   --bg-color: var(--color-dark);
   --fg-color: var(--color-light);
+  --table-color-odd: var(--color-dark-gray);
+  --table-color-even: var(--color-light-gray);
   --accent-color: var(--color-green-dark);
   --accent-color-hover: var(--color-green-light);
 
@@ -40,6 +48,8 @@
 :root[data-theme='light'] {
   --bg-color: var(--color-light);
   --fg-color: var(--color-dark);
+  --table-color-odd: var(--color-light-gray);
+  --table-color-even: var(--color-dark-gray);
   --accent-color: var(--color-rebeccapurple);
   --accent-color-hover: var(--color-purple);
 
