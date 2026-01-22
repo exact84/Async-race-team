@@ -1,7 +1,9 @@
+import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { EngineService } from '../../services/engine-service/engine.service';
 import type { DriveMetrics, DriveResult } from '../../services/engine-service/types';
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
+import type { Emitter } from '../../shared/event-emitter/event-emitter';
 import type { CarView } from './car.view';
 
 type SingleStartCallback = (id: number) => void;
@@ -11,6 +13,8 @@ export class CarController {
 
   private driveAbortController: AbortController | null = null;
 
+  private readonly emitter: Emitter<GaragePageEvents> | null = null;
+
   private readonly engineService: EngineService;
 
   private readonly garageService: GarageService;
@@ -19,10 +23,17 @@ export class CarController {
 
   private readonly view: CarView;
 
-  public constructor(view: CarView, engineService: EngineService, garageService: GarageService) {
+  public constructor(
+    view: CarView,
+    engineService: EngineService,
+    garageService: GarageService,
+    emitter: Emitter<GaragePageEvents> | null = null
+  ) {
     this.view = view;
     this.engineService = engineService;
     this.garageService = garageService;
+
+    this.emitter = emitter;
 
     this.carId = view.getCarData().id;
 
@@ -35,7 +46,10 @@ export class CarController {
   }
 
   public delete(): Promise<object> {
-    return this.garageService.delete(this.carId);
+    return this.garageService.delete(this.carId).then(() => {
+      this.emitter?.emit('garage:delete-car');
+      return {};
+    });
   }
 
   public disableButtons(): void {

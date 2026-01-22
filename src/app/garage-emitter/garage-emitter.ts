@@ -7,6 +7,7 @@ export interface GaragePageEvents {
   'garage:create-one': Omit<Car, 'id'>;
   'garage:created-hundred': never;
   'garage:created-one': never;
+  'garage:delete-car': never;
   'race:completed': never;
   'race:start': never;
   'race:stop': never;

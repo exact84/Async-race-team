@@ -100,36 +100,49 @@ export class GaragePage extends Component {
       this.setTotalCount();
     });
 
+    const unsubscribeDeleteCar = garageEmitter.on('garage:delete-car', () => {
+      const { currentPage, totalCount } = garageStore.getState();
+
+      this.updatePage(currentPage, totalCount);
+
+      this.setTotalCount();
+    });
+
     this.unsubscribeFunctions
       .add(unsubscribeRaceStart)
       .add(unsubscribeRaceStopped)
       .add(unsubscribeCreatedOne)
-      .add(unsubscribeCreatedHundred);
+      .add(unsubscribeCreatedHundred)
+      .add(unsubscribeDeleteCar);
   }
 
   private setupStoreSubscriptions(): void {
     const unsubscribe = garageStore.subscribe(
       (state) => state,
       ({ currentPage, totalCount }) => {
-        this.pagination.setState({
-          page: currentPage,
-          totalPages: Math.ceil(totalCount / CARS_PER_PAGE),
-        });
-
-        this.totalCarsSpan.textContent = totalCount.toString();
-
-        garageService.getAll({ page: currentPage }).then(
-          (cars) => {
-            this.trackController.updateView(cars);
-          },
-          () => {
-            this.trackController.updateView([]);
-          }
-        );
+        this.updatePage(currentPage, totalCount);
       }
     );
 
     this.unsubscribeFunctions.add(unsubscribe);
+  }
+
+  private updatePage(currentPage: number, totalCount: number): void {
+    this.pagination.setState({
+      page: currentPage,
+      totalPages: Math.ceil(totalCount / CARS_PER_PAGE),
+    });
+
+    this.totalCarsSpan.textContent = totalCount.toString();
+
+    garageService.getAll({ page: currentPage }).then(
+      (cars) => {
+        this.trackController.updateView(cars);
+      },
+      () => {
+        this.trackController.updateView([]);
+      }
+    );
   }
 }
 

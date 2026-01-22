@@ -117,7 +117,8 @@ export class TrackController {
       const controller = new CarController(
         new CarView({ car, emitter: this.emitter }),
         this.engineService,
-        this.garageService
+        this.garageService,
+        this.emitter
       );
 
       controller.setOnSingleStart((id) => {
