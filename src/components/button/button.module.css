@@ -7,7 +7,7 @@
   border: none;
   border-radius: 4px;
 
-  color: var(--bg-color);
+  color: var(--color-light);
 
   background-color: var(--accent-color);
 
@@ -38,7 +38,6 @@
 
 @media (hover: hover) {
   .button:not(:disabled):hover {
-    color: var(--bg-color);
     background-color: var(--accent-color-hover);
   }
 }
