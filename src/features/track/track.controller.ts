@@ -87,8 +87,6 @@ export class TrackController {
     }
 
     await Promise.allSettled(drivePromises);
-
-    this.emitter?.emit('race:completed');
   }
 
   public async stopRace(): Promise<void> {
