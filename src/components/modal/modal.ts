@@ -1,5 +1,6 @@
 import { div, h2 } from '@ripetchor/dom';
 
+import { toggleScroll } from '../../shared/utilities';
 import { Button } from '../button/button';
 import styles from './modal.module.css';
 
@@ -28,6 +29,8 @@ export class Modal {
     this.abortController.abort();
 
     this.backdropElement.remove();
+
+    toggleScroll(document.body, 'no-scroll', false);
   }
 
   public open(callback: () => HTMLElement): void {
@@ -39,6 +42,8 @@ export class Modal {
     this.backdropElement.replaceChildren(this.childrenElement);
 
     document.body.append(this.backdropElement);
+
+    toggleScroll(document.body, 'no-scroll', true);
   }
 
   private setupEventListeners(): void {

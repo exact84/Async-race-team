@@ -46,7 +46,6 @@ export class CarForm extends Component<CarFormProperties> {
   );
 
   private readonly inputName = input({
-    'autofocus': true,
     'className': styles.input,
     'data-testid': 'input-car-name',
     'id': 'car-name',
@@ -98,6 +97,12 @@ export class CarForm extends Component<CarFormProperties> {
 
   public render(): DocumentFragment | HTMLElement {
     return this.formElement;
+  }
+
+  protected override connectedCallback(): void {
+    super.connectedCallback();
+
+    this.inputName.focus();
   }
 
   protected disconnectedCallback(): void {
