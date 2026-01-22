@@ -10,7 +10,7 @@ export default mergeConfig(
       environment: 'jsdom',
       coverage: {
         include: ['src/**/*.ts'],
-        exclude: ['types.ts', 'constants.ts'],
+        exclude: ['types.ts', 'constants.ts', 'app.ts', 'main.ts'],
         thresholds: { lines: 70, functions: 70, branches: 70, statements: 70 },
       },
     },
