@@ -9,7 +9,7 @@ import styles from './table.module.css';
 
 export interface TableCell {
   kind: 'img' | 'text';
-  meta?: { className?: string; color?: string; size?: 'lg' | 'md' | 'sm'; tooltip?: string };
+  meta?: { className?: string; color?: string; tooltip?: string };
   value: HTMLElement | number | string;
 }
 
@@ -17,6 +17,7 @@ export interface TableHeader {
   key: string;
   sortable: boolean;
   sorted?: SortOrder;
+  colSize?: 'lg' | 'md' | 'sm';
 }
 export interface TableProperties {
   onClick?(): void;
@@ -54,7 +55,9 @@ export class Table extends Component<TableProperties> {
       ...this.props.records.map((record) =>
         tr(
           { className: styles.tr },
-          ...record.cells.map((cell) => td({ className: styles.td }, cell.value))
+          ...record.cells.map((cell) =>
+            td({ className: styles.td, title: cell.meta?.tooltip }, cell.value)
+          )
         )
       )
     );
@@ -63,10 +66,13 @@ export class Table extends Component<TableProperties> {
   private createThead(): HTMLElement {
     return thead(
       { className: this.props.stickyHeader ? `${styles.thead} ${styles.sticky}` : styles.thead },
-      ...this.props.headers.map((header) =>
-        th(
+      ...this.props.headers.map((header) => {
+        const classNames = [styles.th];
+        if (header.sortable) classNames.push(styles.sortable);
+        if (header.colSize) classNames.push(styles[header.colSize]);
+        return th(
           {
-            className: header.sortable ? `${styles.th} ${styles.sortable}` : styles.th,
+            className: classNames.join(' '),
             click: () => {
               if (!header.sortable) return;
               this.props.onSort?.(header.key);
@@ -77,8 +83,8 @@ export class Table extends Component<TableProperties> {
             { className: styles.span_sortable },
             header.sortable ? (header.sorted ? (header.sorted === 'ASC' ? ' ↑' : ' ↓') : ' ↕') : ''
           )
-        )
-      )
+        );
+      })
     );
   }
 }

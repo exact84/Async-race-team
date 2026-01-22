@@ -25,6 +25,7 @@ export class TableController {
         sortable: this.isSortField(key),
         sorted:
           key === sort && order !== undefined ? (order === 'ASC' ? 'ASC' : 'DESC') : undefined,
+        colSize: key === 'name' ? 'lg' : 'md',
       };
     });
 
@@ -51,32 +52,21 @@ export class TableController {
     if (data.length === 0) return { headers: [], rows: [] };
 
     const headers = this.getTableHeaders(Object.keys(data[0]), sort, order);
-    const rows: TableRecord[] = data.map((item) =>
-      this.mapRecordToCells<WinnerWithCarData>(item, sort, order)
-    );
+    const rows: TableRecord[] = data.map((item) => this.mapRecordToCells<WinnerWithCarData>(item));
+    console.warn(headers, rows);
 
     return { headers, rows };
   }
 
-  public mapRecordToCells<T extends object>(
-    record: T,
-    activeSortField?: keyof T,
-    activeOrder?: SortOrder
-  ): TableRecord {
+  public mapRecordToCells<T extends object>(record: T): TableRecord {
     let value: string | HTMLElement;
     const cells: TableCell[] = Object.entries(record).map(([key, raw]) => {
       value = key === 'color' ? new CarImage({ color: String(raw), size: 'sm' }) : String(raw);
-      const isSortable = typeof value === 'string' || typeof value === 'number';
-      const isActive = key === activeSortField;
 
       return {
         kind: key === 'color' ? 'img' : 'text',
         value,
-        meta: {
-          sortable: isSortable,
-          sorted: isActive ? activeOrder : undefined,
-          tooltip: key === 'color' ? String(raw) : undefined,
-        },
+        meta: { tooltip: key === 'color' ? String(raw) : undefined },
       };
     });
 

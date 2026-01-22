@@ -14,8 +14,8 @@ describe(TableController.name, () => {
     const headers = controller.getTableHeaders(['id', 'name'], 'id', 'ASC');
 
     expect(headers).toEqual([
-      { key: 'id', sortable: true, sorted: 'ASC' },
-      { key: 'name', sortable: false, sorted: undefined },
+      { colSize: 'md', key: 'id', sortable: true, sorted: 'ASC' },
+      { colSize: 'lg', key: 'name', sortable: false, sorted: undefined },
     ]);
   });
 

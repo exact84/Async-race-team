@@ -33,13 +33,20 @@
 .td {
   overflow: hidden;
 
-  width: calc(100% / 5);
   padding: 8px 12px;
   border: 2px solid var(--fg-color);
 
   text-align: left;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.th.sm {
+  width: 15%;
+}
+
+.th.lg {
+  width: 40%;
 }
 
 .tr {
@@ -51,10 +58,6 @@
 .tr:nth-child(even) {
   color: var(--table-color-odd);
   background-color: var(--table-color-even);
-}
-
-.td:nth-child(3) {
-  width: 128%;
 }
 
 .fallbackMessage {
