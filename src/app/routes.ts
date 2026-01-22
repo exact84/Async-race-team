@@ -20,5 +20,5 @@ export const ROUTES: Route[] = [
     path: '/winners',
     title: 'Winners',
   },
-  { path: '/', redirectTo: '/winners' },
+  { path: '/', redirectTo: '/garage' },
 ];
