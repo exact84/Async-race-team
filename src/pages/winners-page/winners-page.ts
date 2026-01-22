@@ -4,6 +4,7 @@ import type { SortField, SortOrder } from '../../services/winners-service/types'
 
 import { Table } from '../../components/table/table';
 import { TableController } from '../../components/table/table.controller';
+import { toastService } from '../../components/toast/toast.service';
 import {
   DEFAULT_SORT_FIELD,
   DEFAULT_SORT_ORDER,
@@ -45,9 +46,8 @@ export class WinnersPage extends Component {
         stickyHeader: true,
         testid: 'winners-table',
       });
-    } catch (error) {
-      // Replace with Toast
-      console.error('Failed to load winners:', error);
+    } catch {
+      toastService.show({ message: 'Failed to load winners', type: 'error' });
     }
     this.setState({});
   }
@@ -66,7 +66,11 @@ export class WinnersPage extends Component {
     // const button = new Button({
     //   buttonSize: 'md',
     //   onClick: (): void => {
-    //     void this.handleSort('wins');
+    //     toastService.show({
+    //       message: 'Победитель гонки: Alexey!!',
+    //       timeout: 100_000,
+    //       type: 'success',
+    //     });
     //   },
     //   textContent: 'Refresh',
     // });
