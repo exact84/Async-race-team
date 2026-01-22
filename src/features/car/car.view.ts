@@ -63,6 +63,8 @@ export class CarView extends Component<CarViewProperties, State> {
 
   private driveMetrics: DriveMetrics | null = null;
 
+  private onRemove: null | VoidFunction = null;
+
   private readonly unsubscribeFunctions = new Set<VoidFunction>();
 
   public constructor(properties: CarViewProperties) {
@@ -136,6 +138,10 @@ export class CarView extends Component<CarViewProperties, State> {
 
   public setDriveMetrics(driveMetrics: DriveMetrics): void {
     this.driveMetrics = driveMetrics;
+  }
+
+  public setOnRemove(callback: VoidFunction): void {
+    this.onRemove = callback;
   }
 
   public startAnimation(): void {
@@ -236,6 +242,8 @@ export class CarView extends Component<CarViewProperties, State> {
       await this.callbacks?.onDelete();
 
       this.remove();
+
+      this.onRemove?.();
     } catch {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }

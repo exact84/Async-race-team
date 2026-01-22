@@ -66,6 +66,10 @@ export class CarController {
     this.view.pauseAnimation();
   }
 
+  public setOnRemove(callback: VoidFunction): void {
+    this.view.setOnRemove(callback);
+  }
+
   public setOnSingleStart(callback: SingleStartCallback): void {
     this.onSingleStart = callback;
   }
