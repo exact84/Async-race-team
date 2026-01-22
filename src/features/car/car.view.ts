@@ -11,7 +11,7 @@ import { CarImage } from '../../components/car-image/car-image';
 import { Modal } from '../../components/modal/modal';
 import { toastService } from '../../components/toast/toast.service';
 import { Component, defineElement } from '../../shared/component/component';
-import { createFragment } from '../../shared/utilities';
+import { createFragment, isAbortError } from '../../shared/utilities';
 import styles from './car.view.module.css';
 
 export interface CarViewCallbacks {
@@ -256,8 +256,11 @@ export class CarView extends Component<CarViewProperties, State> {
 
     try {
       await this.callbacks?.onDrive(this.getAbortSignal());
-    } catch {
-      toastService.show({ message: `Failed to start ${this.state.name}`, type: 'error' });
+    } catch (error: unknown) {
+      if (!isAbortError(error)) {
+        toastService.show({ message: `Failed to start ${this.state.name}`, type: 'error' });
+      }
+
       this.pauseAnimation();
     } finally {
       this.setButtonsState({ delete: true, start: true, stop: false, update: true });
@@ -271,8 +274,10 @@ export class CarView extends Component<CarViewProperties, State> {
       await this.callbacks?.onStop();
 
       this.stopAnimation();
-    } catch {
-      toastService.show({ message: `Failed to stop ${this.state.name}`, type: 'error' });
+    } catch (error: unknown) {
+      if (!isAbortError(error)) {
+        toastService.show({ message: `Failed to stop ${this.state.name}`, type: 'error' });
+      }
     } finally {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
