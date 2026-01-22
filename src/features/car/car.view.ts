@@ -8,6 +8,7 @@ import type { Emitter } from '../../shared/event-emitter/event-emitter';
 import { Button } from '../../components/button/button';
 import { CarForm } from '../../components/car-form/car-form';
 import { CarImage } from '../../components/car-image/car-image';
+import { Modal } from '../../components/modal/modal';
 import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
 import styles from './car.view.module.css';
@@ -270,6 +271,13 @@ export class CarView extends Component<CarViewProperties, State> {
     const { id } = this.getCarData();
     const { color, name } = this.state;
 
+    const modal = new Modal({
+      onClose: (): void => {
+        this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+      },
+      title: 'Update car',
+    });
+
     const carForm = new CarForm({
       color,
       id,
@@ -284,13 +292,13 @@ export class CarView extends Component<CarViewProperties, State> {
           .catch(() => null)
           .finally(() => {
             carForm.remove();
+            modal.close();
             this.setButtonsState({ delete: false, start: false, stop: true, update: false });
           });
       },
     });
 
-    // TODO: replace by modal
-    this.append(carForm);
+    modal.open(() => carForm);
   }
 
   private setupListeners(): void {

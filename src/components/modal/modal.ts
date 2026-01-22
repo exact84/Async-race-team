@@ -5,6 +5,7 @@ import { Button } from '../button/button';
 import styles from './modal.module.css';
 
 interface ModalProperties {
+  onClose?: VoidFunction;
   title: string;
 }
 
@@ -31,6 +32,8 @@ export class Modal {
     this.backdropElement.remove();
 
     toggleScroll(document.body, 'no-scroll', false);
+
+    this.properties.onClose?.();
   }
 
   public open(callback: () => HTMLElement): void {
