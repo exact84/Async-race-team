@@ -63,7 +63,3 @@
 .fallbackMessage {
   text-align: center;
 }
-
-.tr:hover {
-  background-color: var(--accent-color-hover);
-}

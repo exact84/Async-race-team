@@ -53,7 +53,6 @@ export class TableController {
 
     const headers = this.getTableHeaders(Object.keys(data[0]), sort, order);
     const rows: TableRecord[] = data.map((item) => this.mapRecordToCells<WinnerWithCarData>(item));
-    console.warn(headers, rows);
 
     return { headers, rows };
   }
