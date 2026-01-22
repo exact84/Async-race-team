@@ -16,8 +16,11 @@
   left: 50%;
   translate: -50% -50%;
 
+  overflow-y: auto;
+
   width: 100%;
   max-width: 640px;
+  max-height: 90dvh;
   margin-inline: auto;
   padding: 20px;
   border: 2px solid var(--accent-color);
