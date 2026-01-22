@@ -1,6 +1,6 @@
-#toast-container {
+.toast-container {
   position: fixed;
-  z-index: 9999;
+  z-index: 888;
   top: 0.5rem;
   right: 0.5rem;
 
@@ -24,6 +24,7 @@
 }
 
 .toast.success {
+  justify-self: end;
   background: lightgreen;
 }
 
@@ -38,8 +39,12 @@
 button.close {
   cursor: pointer;
 
+  display: flex;
+
+  width: 24px;
+  height: 24px;
   margin-left: 0.5rem;
-  padding: 0.5rem;
+  padding: 0.25rem 0.13rem;
   border: none;
   border-radius: 0.5rem;
 }
