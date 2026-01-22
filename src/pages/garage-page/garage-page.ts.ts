@@ -8,6 +8,7 @@ import { TrackController } from '../../features/track/track.controller';
 import { TrackView } from '../../features/track/track.view';
 import { serviceProvider } from '../../services/service-provider';
 import { Component, defineElement } from '../../shared/component/component';
+import styles from './garage-page.module.css';
 
 const engineService = serviceProvider.engineService();
 const garageService = serviceProvider.garageService();
@@ -48,8 +49,7 @@ export class GaragePage extends Component {
     return div(
       { className: 'page' },
       h1(null, 'Garage: ', this.totalCarsSpan),
-      this.pagination,
-      trackControls,
+      div({ className: styles.controls }, trackControls, this.pagination),
       this.trackController.getView()
     );
   }
