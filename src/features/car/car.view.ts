@@ -3,7 +3,7 @@ import { div } from '@ripetchor/dom';
 import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { DriveMetrics, DriveResult } from '../../services/engine-service/types';
 import type { Car } from '../../services/garage-service/types';
-import type { Emitter } from '../../shared/event-emitter/event-emitter';
+import type { Emitter } from '../../shared/emitter/emitter';
 
 import { Button } from '../../components/button/button';
 import { CarForm } from '../../components/car-form/car-form';

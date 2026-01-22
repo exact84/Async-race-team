@@ -1,6 +1,6 @@
 import { expect, it, vi } from 'vitest';
 
-import { Emitter } from './event-emitter';
+import { Emitter } from './emitter';
 
 interface TestEvents {
   count: string;

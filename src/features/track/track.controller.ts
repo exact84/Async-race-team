@@ -3,7 +3,7 @@ import type { EngineService } from '../../services/engine-service/engine.service
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
 import type { WinnersService } from '../../services/winners-service/winners.service';
-import type { Emitter } from '../../shared/event-emitter/event-emitter';
+import type { Emitter } from '../../shared/emitter/emitter';
 import type { TrackView } from './track.view';
 
 import { CarController } from '../car/car.controller';

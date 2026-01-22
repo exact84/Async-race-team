@@ -1,5 +1,5 @@
 import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
-import type { Emitter } from '../../shared/event-emitter/event-emitter';
+import type { Emitter } from '../../shared/emitter/emitter';
 
 import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
