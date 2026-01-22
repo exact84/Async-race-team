@@ -30,7 +30,7 @@ export class WinnersService {
     return this.instance;
   }
 
-  public create(body: Omit<WinnerRecord, 'id'>, signal?: AbortSignal): Promise<WinnerRecord> {
+  public create(body: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.post({
       body,
       signal,
@@ -110,7 +110,7 @@ export class WinnersService {
   ): Promise<WinnerRecord> {
     return this.get(id, signal).then(
       (existing) => this.update(this.mergeRecords(existing, body)),
-      () => this.create(body, signal)
+      () => this.create({ id, ...body }, signal)
     );
   }
 
