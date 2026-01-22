@@ -14,7 +14,7 @@ export class Modal {
 
   private readonly backdropElement = div({ className: styles.backdrop });
 
-  private readonly buttonClose = new Button({ textContent: 'Close' });
+  private readonly buttonClose = new Button({ testid: 'button-modal-close', textContent: 'Close' });
 
   private readonly childrenElement = div({ className: styles.children });
 
@@ -36,8 +36,15 @@ export class Modal {
     this.properties.onClose?.();
   }
 
+  public getContainer(): HTMLElement {
+    return this.backdropElement;
+  }
+
   public open(callback: () => HTMLElement): void {
-    const modalHeader = div({ className: styles.modalHeader }, h2(null, this.properties.title));
+    const modalHeader = div(
+      { className: styles.modalHeader },
+      h2({ 'data-testid': 'modal-heading' }, this.properties.title)
+    );
     const modalFooter = div({ className: styles.modalFooter }, this.buttonClose);
 
     this.childrenElement.replaceChildren(modalHeader, callback(), modalFooter);
