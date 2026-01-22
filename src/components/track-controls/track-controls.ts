@@ -23,7 +23,7 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   private readonly buttonCreateOne = new Button({
     onClick: (): void => {
-      const modal = new Modal();
+      const modal = new Modal({ title: 'Create car' });
 
       const carForm = new CarForm({
         mode: 'create',
@@ -31,6 +31,8 @@ export class TrackControls extends Component<TrackControlProperties> {
           this.props.emitter.emit('garage:create-one', { color: data.color, name: data.name });
 
           carForm.remove();
+
+          modal.close();
         },
       });
 

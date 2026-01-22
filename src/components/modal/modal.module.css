@@ -16,12 +16,22 @@
   left: 50%;
   translate: -50% -50%;
 
-  display: grid;
-  gap: 2rem;
-
   width: 100%;
-  max-width: 64rem;
+  max-width: 640px;
   margin-inline: auto;
-  padding: 2rem;
-  border-radius: 0.5rem;
+  padding: 20px;
+  border: 2px solid var(--accent-color);
+  border-radius: 5px;
+
+  background-color: var(--bg-color);
+}
+
+.modalHeader,
+.modalFooter {
+  display: flex;
+  justify-content: center;
+}
+
+.modalFooter {
+  margin-top: 10px;
 }

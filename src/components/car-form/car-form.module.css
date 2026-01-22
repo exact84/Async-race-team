@@ -5,10 +5,7 @@
   align-items: center;
   justify-content: center;
 
-  max-width: 500px;
   margin-inline: auto;
-  padding: 10px; /* TODO: remove if modal will have own */
-  border: 2px solid var(--accent-color); /* TODO: remove if modal will have own */
   border-radius: 5px;
 }
 
