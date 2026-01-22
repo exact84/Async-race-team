@@ -1,4 +1,4 @@
-import { div, h1, span } from '@ripetchor/dom';
+import { div, h1, main, span } from '@ripetchor/dom';
 
 import { garageEmitter } from '../../app/garage-emitter/garage-emitter';
 import { garageStore } from '../../app/garage-store/garage-store';
@@ -8,6 +8,7 @@ import { TrackController } from '../../features/track/track.controller';
 import { TrackView } from '../../features/track/track.view';
 import { serviceProvider } from '../../services/service-provider';
 import { Component, defineElement } from '../../shared/component/component';
+import styles from './garage-page.module.css';
 
 const engineService = serviceProvider.engineService();
 const garageService = serviceProvider.garageService();
@@ -45,11 +46,10 @@ export class GaragePage extends Component {
   public render(): HTMLElement {
     const trackControls = new TrackControls({ emitter: garageEmitter });
 
-    return div(
+    return main(
       { className: 'page' },
       h1(null, 'Garage: ', this.totalCarsSpan),
-      this.pagination,
-      trackControls,
+      div({ className: styles.controls }, trackControls, this.pagination),
       this.trackController.getView()
     );
   }
@@ -100,36 +100,49 @@ export class GaragePage extends Component {
       this.setTotalCount();
     });
 
+    const unsubscribeDeleteCar = garageEmitter.on('garage:delete-car', () => {
+      const { currentPage, totalCount } = garageStore.getState();
+
+      this.updatePage(currentPage, totalCount);
+
+      this.setTotalCount();
+    });
+
     this.unsubscribeFunctions
       .add(unsubscribeRaceStart)
       .add(unsubscribeRaceStopped)
       .add(unsubscribeCreatedOne)
-      .add(unsubscribeCreatedHundred);
+      .add(unsubscribeCreatedHundred)
+      .add(unsubscribeDeleteCar);
   }
 
   private setupStoreSubscriptions(): void {
     const unsubscribe = garageStore.subscribe(
       (state) => state,
       ({ currentPage, totalCount }) => {
-        this.pagination.setState({
-          page: currentPage,
-          totalPages: Math.ceil(totalCount / CARS_PER_PAGE),
-        });
-
-        this.totalCarsSpan.textContent = totalCount.toString();
-
-        garageService.getAll({ page: currentPage }).then(
-          (cars) => {
-            this.trackController.updateView(cars);
-          },
-          () => {
-            this.trackController.updateView([]);
-          }
-        );
+        this.updatePage(currentPage, totalCount);
       }
     );
 
     this.unsubscribeFunctions.add(unsubscribe);
+  }
+
+  private updatePage(currentPage: number, totalCount: number): void {
+    this.pagination.setState({
+      page: currentPage,
+      totalPages: Math.ceil(totalCount / CARS_PER_PAGE),
+    });
+
+    this.totalCarsSpan.textContent = totalCount.toString();
+
+    garageService.getAll({ page: currentPage }).then(
+      (cars) => {
+        this.trackController.updateView(cars);
+      },
+      () => {
+        this.trackController.updateView([]);
+      }
+    );
   }
 }
 

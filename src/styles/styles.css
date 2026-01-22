@@ -3,8 +3,8 @@
   --color-light-gray: #aaa;
   --color-dark: #121212;
   --color-light: #eee;
-  --color-green-light: #42b883;
-  --color-green-dark: #1d8758;
+  --color-blue-light: #2747a6;
+  --color-blue-dark: #1e3a8a;
   --color-rebeccapurple: rebeccapurple;
   --color-purple: #9575cd;
   --transition-duration: 0.3s;
@@ -18,8 +18,8 @@
     --fg-color: var(--color-light);
     --table-color-odd: var(--color-dark-gray);
     --table-color-even: var(--color-light-gray);
-    --accent-color: var(--color-green-dark);
-    --accent-color-hover: var(--color-green-light);
+    --accent-color: var(--color-blue-dark);
+    --accent-color-hover: var(--color-blue-light);
   }
 }
 
@@ -39,8 +39,8 @@
   --fg-color: var(--color-light);
   --table-color-odd: var(--color-dark-gray);
   --table-color-even: var(--color-light-gray);
-  --accent-color: var(--color-green-dark);
-  --accent-color-hover: var(--color-green-light);
+  --accent-color: var(--color-blue-dark);
+  --accent-color-hover: var(--color-blue-light);
 
   color-scheme: dark;
 }

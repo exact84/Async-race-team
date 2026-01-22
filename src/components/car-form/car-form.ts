@@ -1,4 +1,4 @@
-import { form, input, label } from '@ripetchor/dom';
+import { div, form, input, label } from '@ripetchor/dom';
 
 import type { Car } from '../../services/garage-service/types';
 
@@ -71,9 +71,11 @@ export class CarForm extends Component<CarFormProperties> {
         this.handleSubmit(event);
       },
     },
-    this.labelName,
-    this.labelColor,
-    this.carImage,
+    div(
+      { className: styles.inputsContainer },
+      div({ className: styles.labelsContainer }, this.labelName, this.labelColor),
+      this.carImage
+    ),
     this.buttonSubmit
   );
 

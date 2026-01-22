@@ -21,9 +21,18 @@ export class TrackView extends Component<object, State> {
 
   public render(): DocumentFragment {
     return createFragment(
-      ...this.state.carControllers.map((controller) =>
-        div({ 'className': styles.trackLane, 'data-testid': 'track-lane' }, controller.getView())
-      )
+      ...this.state.carControllers.map((controller) => {
+        const trackLane = div(
+          { 'className': styles.trackLane, 'data-testid': 'track-lane' },
+          controller.getView()
+        );
+
+        controller.setOnRemove(() => {
+          trackLane.remove();
+        });
+
+        return trackLane;
+      })
     );
   }
 }
