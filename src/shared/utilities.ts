@@ -25,3 +25,7 @@ export function getRandomItem<T>(array: T[]): T {
 
   return array[index];
 }
+
+export function toggleScroll(element: HTMLElement, className: string, lock: boolean): void {
+  element.classList.toggle(className, lock);
+}

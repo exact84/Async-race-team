@@ -76,3 +76,7 @@ body {
   color: var(--fg-color);
   background-color: var(--bg-color);
 }
+
+.no-scroll {
+  overflow: hidden;
+}
