@@ -85,6 +85,11 @@ export class TrackController {
 
     if (winner) {
       await this.winnersService.upsert(winner.id, { time: winner.time, wins: 1 });
+
+      toastService.show({
+        message: `"${winner.name}" wins! Time: ${winner.time.toString()}s`,
+        type: 'success',
+      });
     }
 
     await Promise.allSettled(drivePromises);
