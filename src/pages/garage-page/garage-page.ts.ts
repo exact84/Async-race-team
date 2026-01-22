@@ -1,4 +1,4 @@
-import { div, h1, span } from '@ripetchor/dom';
+import { div, h1, main, span } from '@ripetchor/dom';
 
 import { garageEmitter } from '../../app/garage-emitter/garage-emitter';
 import { garageStore } from '../../app/garage-store/garage-store';
@@ -46,7 +46,7 @@ export class GaragePage extends Component {
   public render(): HTMLElement {
     const trackControls = new TrackControls({ emitter: garageEmitter });
 
-    return div(
+    return main(
       { className: 'page' },
       h1(null, 'Garage: ', this.totalCarsSpan),
       div({ className: styles.controls }, trackControls, this.pagination),
