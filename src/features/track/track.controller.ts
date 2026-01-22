@@ -6,6 +6,7 @@ import type { WinnersService } from '../../services/winners-service/winners.serv
 import type { Emitter } from '../../shared/emitter/emitter';
 import type { TrackView } from './track.view';
 
+import { toastService } from '../../components/toast/toast.service';
 import { CarController } from '../car/car.controller';
 import { CarView } from '../car/car.view';
 
@@ -160,24 +161,32 @@ export class TrackController {
         controller.disableButtons();
       }
 
-      this.startRace().catch(console.warn);
+      this.startRace().catch(() => {
+        toastService.show({ message: 'Failed to start race', type: 'error' });
+      });
     });
 
     const unsubscribeStopRace = this.emitter.on('race:stop', () => {
-      this.stopRace().catch(console.warn);
+      this.stopRace().catch(() => {
+        toastService.show({ message: 'Failed to stop race', type: 'error' });
+      });
     });
 
     const unsubscribeCreateHundred = this.emitter.on('garage:create-hundred', () => {
       this.garageService.createRandomCars().then(
         () => this.emitter?.emit('garage:created-hundred'),
-        () => null
+        () => {
+          toastService.show({ message: 'Failed to create hundred cars', type: 'error' });
+        }
       );
     });
 
     const unsubscribeCreateOne = this.emitter.on('garage:create-one', (payload) => {
       this.garageService.create(payload).then(
         () => this.emitter?.emit('garage:created-one'),
-        () => null
+        () => {
+          toastService.show({ message: 'Failed to create one car', type: 'error' });
+        }
       );
     });
 

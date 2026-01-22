@@ -9,6 +9,7 @@ import { Button } from '../../components/button/button';
 import { CarForm } from '../../components/car-form/car-form';
 import { CarImage } from '../../components/car-image/car-image';
 import { Modal } from '../../components/modal/modal';
+import { toastService } from '../../components/toast/toast.service';
 import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
 import styles from './car.view.module.css';
@@ -245,6 +246,7 @@ export class CarView extends Component<CarViewProperties, State> {
 
       this.onRemove?.();
     } catch {
+      toastService.show({ message: `Failed to delete ${this.state.name}`, type: 'error' });
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
   }
@@ -255,6 +257,7 @@ export class CarView extends Component<CarViewProperties, State> {
     try {
       await this.callbacks?.onDrive(this.getAbortSignal());
     } catch {
+      toastService.show({ message: `Failed to start ${this.state.name}`, type: 'error' });
       this.pauseAnimation();
     } finally {
       this.setButtonsState({ delete: true, start: true, stop: false, update: true });
@@ -268,6 +271,8 @@ export class CarView extends Component<CarViewProperties, State> {
       await this.callbacks?.onStop();
 
       this.stopAnimation();
+    } catch {
+      toastService.show({ message: `Failed to stop ${this.state.name}`, type: 'error' });
     } finally {
       this.setButtonsState({ delete: false, start: false, stop: true, update: false });
     }
@@ -297,7 +302,9 @@ export class CarView extends Component<CarViewProperties, State> {
           .then(() => {
             this.setState({ color: carData.color, name: carData.name });
           })
-          .catch(() => null)
+          .catch(() => {
+            toastService.show({ message: `Failed to update ${this.state.name}`, type: 'error' });
+          })
           .finally(() => {
             carForm.remove();
             modal.close();
