@@ -3,6 +3,7 @@ import { Router } from '@ripetchor/r-router';
 
 import { NAV_LINKS } from '../components/navbar/nav-links';
 import { Navbar } from '../components/navbar/navbar';
+import { ThemeSwitcher } from '../components/theme-switcher/theme-switcher';
 import { ToastContainer } from '../components/toast/toast';
 import { toastService } from '../components/toast/toast.service';
 import styles from './app.module.css';
@@ -18,7 +19,14 @@ export class App {
       (outlet) => {
         const navbar = new Navbar({ links: NAV_LINKS });
 
-        this.root.append(navbar, outlet);
+        const themeSwitcher = new ThemeSwitcher({
+          onChange: (v): void => {
+            document.documentElement.dataset.theme = v;
+          },
+          selectedTheme: 'dark',
+        });
+
+        this.root.append(themeSwitcher, navbar, outlet);
 
         document.body.append(this.root);
 
