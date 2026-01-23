@@ -3,9 +3,11 @@ import type { EngineService } from '../../services/engine-service/engine.service
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
 import type { WinnersService } from '../../services/winners-service/winners.service';
-import type { Emitter } from '../../shared/event-emitter/event-emitter';
+import type { Emitter } from '../../shared/emitter/emitter';
 import type { TrackView } from './track.view';
 
+import { toastService } from '../../components/toast/toast.service';
+import { isAbortError } from '../../shared/utilities';
 import { CarController } from '../car/car.controller';
 import { CarView } from '../car/car.view';
 
@@ -84,11 +86,14 @@ export class TrackController {
 
     if (winner) {
       await this.winnersService.upsert(winner.id, { time: winner.time, wins: 1 });
+
+      toastService.show({
+        message: `"${winner.name}" wins! Time: ${winner.time.toString()}s`,
+        type: 'success',
+      });
     }
 
     await Promise.allSettled(drivePromises);
-
-    this.emitter?.emit('race:completed');
   }
 
   public async stopRace(): Promise<void> {
@@ -147,6 +152,30 @@ export class TrackController {
     );
   }
 
+  private onRaceStart(): void {
+    for (const controller of this.carControllers) {
+      controller.disableButtons();
+    }
+
+    this.startRace().catch((error: unknown) => {
+      if (isAbortError(error)) {
+        return;
+      }
+
+      toastService.show({ message: 'Failed to start race', type: 'error' });
+    });
+  }
+
+  private onRaceStop(): void {
+    this.stopRace().catch((error: unknown) => {
+      if (isAbortError(error)) {
+        return;
+      }
+
+      toastService.show({ message: 'Failed to stop race', type: 'error' });
+    });
+  }
+
   private recreateAbortcontroller(controller: AbortController | null): AbortController {
     controller?.abort();
     return new AbortController();
@@ -158,28 +187,28 @@ export class TrackController {
     }
 
     const unsubscribeStartRace = this.emitter.on('race:start', () => {
-      for (const controller of this.carControllers) {
-        controller.disableButtons();
-      }
-
-      this.startRace().catch(console.warn);
+      this.onRaceStart();
     });
 
     const unsubscribeStopRace = this.emitter.on('race:stop', () => {
-      this.stopRace().catch(console.warn);
+      this.onRaceStop();
     });
 
     const unsubscribeCreateHundred = this.emitter.on('garage:create-hundred', () => {
       this.garageService.createRandomCars().then(
         () => this.emitter?.emit('garage:created-hundred'),
-        () => null
+        () => {
+          toastService.show({ message: 'Failed to create hundred cars', type: 'error' });
+        }
       );
     });
 
     const unsubscribeCreateOne = this.emitter.on('garage:create-one', (payload) => {
       this.garageService.create(payload).then(
         () => this.emitter?.emit('garage:created-one'),
-        () => null
+        () => {
+          toastService.show({ message: 'Failed to create one car', type: 'error' });
+        }
       );
     });
 

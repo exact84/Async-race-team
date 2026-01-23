@@ -26,6 +26,10 @@ export function getRandomItem<T>(array: T[]): T {
   return array[index];
 }
 
+export function isAbortError(error: unknown): boolean {
+  return error instanceof Error && error.name === 'AbortError';
+}
+
 export function toggleScroll(element: HTMLElement, className: string, lock: boolean): void {
   element.classList.toggle(className, lock);
 }

@@ -99,7 +99,11 @@ describe(winnersService.upsert.name, () => {
 
     const createSpy = vi.spyOn(winnersService, 'create');
 
-    await expect(winnersService.upsert(id, { time: 2, wins: 2 })).rejects.toThrow();
+    await expect(winnersService.upsert(id, { time: 2, wins: 2 })).resolves.toEqual({
+      id,
+      time: 2,
+      wins: 2,
+    });
 
     expect(createSpy).toBeCalled();
 

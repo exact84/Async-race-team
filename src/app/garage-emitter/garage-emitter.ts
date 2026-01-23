@@ -1,6 +1,6 @@
 import type { Car } from '../../services/garage-service/types';
 
-import { Emitter } from '../../shared/event-emitter/event-emitter';
+import { Emitter } from '../../shared/emitter/emitter';
 
 export interface GaragePageEvents {
   'garage:create-hundred': never;
@@ -8,7 +8,6 @@ export interface GaragePageEvents {
   'garage:created-hundred': never;
   'garage:created-one': never;
   'garage:delete-car': never;
-  'race:completed': never;
   'race:start': never;
   'race:stop': never;
 }

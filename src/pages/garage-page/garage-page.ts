@@ -3,6 +3,7 @@ import { div, h1, main, span } from '@ripetchor/dom';
 import { garageEmitter } from '../../app/garage-emitter/garage-emitter';
 import { garageStore } from '../../app/garage-store/garage-store';
 import { Pagination } from '../../components/pagination/pagination';
+import { toastService } from '../../components/toast/toast.service';
 import { TrackControls } from '../../components/track-controls/track-controls';
 import { TrackController } from '../../features/track/track.controller';
 import { TrackView } from '../../features/track/track.view';
@@ -79,7 +80,9 @@ export class GaragePage extends Component {
       (count) => {
         garageStore.setState({ totalCount: Number.parseInt(count ?? '0') });
       },
-      () => null
+      () => {
+        toastService.show({ message: 'Failed to get total count of cars', type: 'error' });
+      }
     );
   }
 
@@ -141,6 +144,7 @@ export class GaragePage extends Component {
       },
       () => {
         this.trackController.updateView([]);
+        toastService.show({ message: 'Failed to get data', type: 'error' });
       }
     );
   }

@@ -3,7 +3,7 @@ import type { EngineService } from '../../services/engine-service/engine.service
 import type { DriveMetrics, DriveResult } from '../../services/engine-service/types';
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
-import type { Emitter } from '../../shared/event-emitter/event-emitter';
+import type { Emitter } from '../../shared/emitter/emitter';
 import type { CarView } from './car.view';
 
 type SingleStartCallback = (id: number) => void;
