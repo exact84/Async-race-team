@@ -94,6 +94,13 @@ export class WinnersService {
       .then(extractTotalCountHeader);
   }
 
+  public has(id: number): Promise<boolean> {
+    return this.get(id).then(
+      () => true,
+      () => false
+    );
+  }
+
   public update(record: WinnerRecord, signal?: AbortSignal): Promise<WinnerRecord> {
     return this.http.put({
       body: record,

@@ -50,14 +50,18 @@ export class CarController {
     });
   }
 
-  public delete(): Promise<object> {
-    return Promise.all([
-      this.garageService.delete(this.carId),
-      this.winnersService.delete(this.carId),
-    ]).then(() => {
-      this.emitter?.emit('garage:delete-car');
-      return {};
-    });
+  public async delete(): Promise<object> {
+    await this.garageService.delete(this.carId);
+
+    const hasRecord = await this.winnersService.has(this.carId);
+
+    if (hasRecord) {
+      await this.winnersService.delete(this.carId);
+    }
+
+    this.emitter?.emit('garage:delete-car');
+
+    return {};
   }
 
   public disableButtons(): void {
