@@ -3,6 +3,7 @@ import type { EngineService } from '../../services/engine-service/engine.service
 import type { DriveMetrics, DriveResult } from '../../services/engine-service/types';
 import type { GarageService } from '../../services/garage-service/garage.service';
 import type { Car } from '../../services/garage-service/types';
+import type { WinnersService } from '../../services/winners-service/winners.service';
 import type { Emitter } from '../../shared/emitter/emitter';
 import type { CarView } from './car.view';
 
@@ -23,15 +24,19 @@ export class CarController {
 
   private readonly view: CarView;
 
+  private readonly winnersService: WinnersService;
+
   public constructor(
     view: CarView,
     engineService: EngineService,
     garageService: GarageService,
+    winnersService: WinnersService,
     emitter: Emitter<GaragePageEvents> | null = null
   ) {
     this.view = view;
     this.engineService = engineService;
     this.garageService = garageService;
+    this.winnersService = winnersService;
 
     this.emitter = emitter;
 
@@ -46,7 +51,10 @@ export class CarController {
   }
 
   public delete(): Promise<object> {
-    return this.garageService.delete(this.carId).then(() => {
+    return Promise.all([
+      this.garageService.delete(this.carId),
+      this.winnersService.delete(this.carId),
+    ]).then(() => {
       this.emitter?.emit('garage:delete-car');
       return {};
     });
