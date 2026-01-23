@@ -2,7 +2,7 @@ import type { TypeGuard } from './types';
 
 const LS_SUFFIX = '2a0000c0-e0af-4bda-9964-00d00208f5fc';
 
-type LocalStorageKey = 'app-theme';
+export type LocalStorageKey = 'app-theme';
 
 export function getFromLocalStorage<T>(
   key: LocalStorageKey,
