@@ -131,14 +131,20 @@ export class GaragePage extends Component {
   }
 
   private updatePage(currentPage: number, totalCount: number): void {
-    this.pagination.setState({
-      page: currentPage,
-      totalPages: Math.ceil(totalCount / CARS_PER_PAGE),
-    });
+    const totalPages = Math.max(1, Math.ceil(totalCount / CARS_PER_PAGE));
+
+    const normalizedPage = Math.min(currentPage, totalPages);
+
+    if (normalizedPage !== currentPage) {
+      garageStore.setState({ currentPage: normalizedPage });
+      return;
+    }
+
+    this.pagination.setState({ page: normalizedPage, totalPages });
 
     this.totalCarsSpan.textContent = totalCount.toString();
 
-    garageService.getAll({ page: currentPage }).then(
+    garageService.getAll({ page: normalizedPage }).then(
       (cars) => {
         this.trackController.updateView(cars);
       },
