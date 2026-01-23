@@ -104,7 +104,7 @@ export class CarView extends Component<CarViewProperties, State> {
 
     this.initializeButtonListeners();
 
-    this.carImage = new CarImage({ color: this.state.color });
+    this.carImage = new CarImage({ color: this.state.color, size: 'md' });
 
     return createFragment(
       div(null, this.state.name),

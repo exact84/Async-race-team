@@ -5,6 +5,7 @@ import { CarView } from './car.view';
 
 const engineService = serviceProvider.engineService();
 const garageService = serviceProvider.garageService();
+const winnersService = serviceProvider.winnersService();
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -12,7 +13,7 @@ afterEach(() => {
 
 it('getView returns view', () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   expect(controller.getView()).toBeInstanceOf(CarView);
 });
@@ -20,7 +21,7 @@ it('getView returns view', () => {
 it('passes callbacks to view', () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
   const setCallbacksSpy = vi.spyOn(view, 'setCallbacks');
-  new CarController(view, engineService, garageService);
+  new CarController(view, engineService, garageService, winnersService);
 
   expect(setCallbacksSpy).toBeCalled();
 });
@@ -29,7 +30,8 @@ it('delete should call garageService.delete', async () => {
   const controller = new CarController(
     new CarView({ car: MOCK_SINGLE_CAR, emitter: null }),
     engineService,
-    garageService
+    garageService,
+    winnersService
   );
   const spy = vi.spyOn(garageService, 'delete');
 
@@ -40,7 +42,7 @@ it('delete should call garageService.delete', async () => {
 
 it('startEngine should call engineService.toggle', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   const toggleSpy = vi.spyOn(engineService, 'toggle');
 
@@ -51,7 +53,7 @@ it('startEngine should call engineService.toggle', async () => {
 
 it('drive should call startEngine and engineService.drive', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   const driveSpy = vi.spyOn(engineService, 'drive');
 
@@ -62,7 +64,7 @@ it('drive should call startEngine and engineService.drive', async () => {
 
 it('stop should call engineService.toggle with', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   const toggleSpy = vi.spyOn(engineService, 'toggle');
   toggleSpy.mockResolvedValue(MOCK_STOPPED_ENGINE_METRICS);
@@ -74,7 +76,7 @@ it('stop should call engineService.toggle with', async () => {
 
 it('update should call garageService.update', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   const updateSpy = vi.spyOn(garageService, 'update');
 
@@ -85,7 +87,7 @@ it('update should call garageService.update', async () => {
 
 it('drive recreates AbortController and aborts previous one', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   const parentController = new AbortController();
   const driveSpy = vi.spyOn(engineService, 'drive');
@@ -99,7 +101,7 @@ it('drive recreates AbortController and aborts previous one', async () => {
 
 it('parent abort signal aborts drive signal', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   const parentController = new AbortController();
   const drivePromise = controller.drive(parentController.signal);
@@ -111,7 +113,7 @@ it('parent abort signal aborts drive signal', async () => {
 
 it('startEngine sets drive metrics to view', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   const setMetricsSpy = vi.spyOn(view, 'setDriveMetrics');
   await controller.startEngine(view.getAbortSignal());
@@ -121,7 +123,7 @@ it('startEngine sets drive metrics to view', async () => {
 
 it('stop aborts active drive AbortController', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   await controller.drive(view.getAbortSignal());
 
@@ -135,7 +137,7 @@ it('stop aborts active drive AbortController', async () => {
 
 it('delete passes abort signal when drive is active', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   await controller.drive(view.getAbortSignal());
 
@@ -147,7 +149,7 @@ it('delete passes abort signal when drive is active', async () => {
 
 it('update passes abort signal when drive is active', async () => {
   const view = new CarView({ car: MOCK_SINGLE_CAR, emitter: null });
-  const controller = new CarController(view, engineService, garageService);
+  const controller = new CarController(view, engineService, garageService, winnersService);
 
   await controller.drive(view.getAbortSignal());
 

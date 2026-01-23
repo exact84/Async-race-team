@@ -123,6 +123,7 @@ export class TrackController {
         new CarView({ car, emitter: this.emitter }),
         this.engineService,
         this.garageService,
+        this.winnersService,
         this.emitter
       );
 
