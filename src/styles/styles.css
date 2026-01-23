@@ -20,6 +20,7 @@
     --table-color-even: var(--color-light-gray);
     --accent-color: var(--color-blue-dark);
     --accent-color-hover: var(--color-blue-light);
+    --header-bg: var(--color-dark-gray);
   }
 }
 
@@ -31,6 +32,7 @@
     --table-color-even: var(--color-dark-gray);
     --accent-color: var(--color-rebeccapurple);
     --accent-color-hover: var(--color-purple);
+    --header-bg: var(--color-light-gray);
   }
 }
 
@@ -41,6 +43,7 @@
   --table-color-even: var(--color-light-gray);
   --accent-color: var(--color-blue-dark);
   --accent-color-hover: var(--color-blue-light);
+  --header-bg: var(--color-dark-gray);
 
   color-scheme: dark;
 }
@@ -52,6 +55,7 @@
   --table-color-even: var(--color-dark-gray);
   --accent-color: var(--color-rebeccapurple);
   --accent-color-hover: var(--color-purple);
+  --header-bg: var(--color-light-gray);
 
   color-scheme: light;
 }

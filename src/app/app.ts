@@ -1,4 +1,4 @@
-import { div } from '@ripetchor/dom';
+import { div, header } from '@ripetchor/dom';
 import { Router } from '@ripetchor/r-router';
 
 import { NAV_LINKS } from '../components/navbar/nav-links';
@@ -26,7 +26,9 @@ export class App {
           selectedTheme: 'dark',
         });
 
-        this.root.append(themeSwitcher, navbar, outlet);
+        const appHeader = header({ className: styles.header }, navbar, themeSwitcher);
+
+        this.root.append(appHeader, outlet);
 
         document.body.append(this.root);
 
