@@ -1,0 +1,9 @@
+.page {
+  display: grid;
+  gap: 10px;
+  place-items: center;
+}
+
+.gif {
+  border-radius: 5px;
+}
