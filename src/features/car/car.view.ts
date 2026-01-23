@@ -256,11 +256,7 @@ export class CarView extends Component<CarViewProperties, State> {
 
     try {
       await this.callbacks?.onDrive(this.getAbortSignal());
-    } catch (error: unknown) {
-      if (!isAbortError(error)) {
-        toastService.show({ message: `Failed to start ${this.state.name}`, type: 'error' });
-      }
-
+    } catch {
       this.pauseAnimation();
     } finally {
       this.setButtonsState({ delete: true, start: true, stop: false, update: true });

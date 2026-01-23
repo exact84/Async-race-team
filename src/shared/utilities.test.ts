@@ -1,4 +1,10 @@
+import { getFromLocalStorage, setToLocalStorage } from './local-storage';
+import { isAppTheme } from './type-guards';
 import { createFragment, getRandomHexColor, getRandomItem } from './utilities';
+
+beforeEach(() => {
+  localStorage.clear();
+});
 
 describe(getRandomHexColor.name, () => {
   it('should return a string starting with #', () => {
@@ -33,9 +39,49 @@ describe(getRandomItem.name, () => {
 });
 
 describe(createFragment.name, () => {
-  it('qweqw', () => {
+  it('should be instance of DocumentFragment', () => {
     const result = createFragment();
 
     expect(result).toBeInstanceOf(DocumentFragment);
+  });
+});
+
+describe(isAppTheme.name, () => {
+  it('should return true for valid input', () => {
+    const result = isAppTheme('dark');
+
+    expect(result).toBe(true);
+  });
+
+  it('should return false for invalid input', () => {
+    const result = isAppTheme('foo-bar-baz');
+
+    expect(result).toBe(false);
+  });
+});
+
+describe(getFromLocalStorage.name, () => {
+  it('should return stored value', () => {
+    setToLocalStorage('app-theme', 'dark');
+
+    const stored = getFromLocalStorage('app-theme', isAppTheme, 'light');
+
+    expect(stored).toBe('dark');
+  });
+
+  it('should return fallback value', () => {
+    const stored = getFromLocalStorage('app-theme', isAppTheme, 'light');
+
+    expect(stored).toBe('light');
+  });
+});
+
+describe(setToLocalStorage.name, () => {
+  it('should save value', () => {
+    setToLocalStorage('app-theme', 'light');
+
+    const result = getFromLocalStorage('app-theme', isAppTheme, 'dark');
+
+    expect(result).toBe('light');
   });
 });

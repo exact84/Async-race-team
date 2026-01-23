@@ -21,7 +21,13 @@ export class Navbar extends Component<NavbarProperties> {
       ul(
         { className: styles.ul },
         ...this.props.links.map((link) =>
-          li({ className: styles.li }, new RouterLink({ ...link, className: styles.a }))
+          li(
+            { className: styles.li },
+            new RouterLink({
+              ...link,
+              className: ({ isActive }) => (isActive ? `${styles.a} ${styles.active}` : styles.a),
+            })
+          )
         )
       )
     );
