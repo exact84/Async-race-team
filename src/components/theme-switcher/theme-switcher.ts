@@ -38,14 +38,15 @@ export class ThemeSwitcher extends Component<ThemeSwitcherProperties> {
           { className: styles.label, htmlFor: option.value },
           option.label,
           input({
-            change: () => {
+            'change': () => {
               this.props.onChange(option.value);
             },
-            checked: selectedTheme === option.value,
-            className: styles.input,
-            id: option.value,
-            name: 'theme',
-            type: 'radio',
+            'checked': selectedTheme === option.value,
+            'className': styles.input,
+            'data-testid': `input-${option.value}`,
+            'id': option.value,
+            'name': 'theme',
+            'type': 'radio',
           })
         )
       )
