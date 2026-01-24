@@ -5,9 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "tsc && vite build",
+    "ci:format": "prettier '**/*.{js,ts,css}'",
     "dev": "vite",
-    "format": "prettier '**/*.{js,ts,css}'",
-    "format:write": "prettier '**/*.{js,ts,css}' --write",
+    "format": "prettier '**/*.{js,ts,css}' --write",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
     "prepare": "husky",

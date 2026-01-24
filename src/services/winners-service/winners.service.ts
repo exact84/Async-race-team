@@ -7,7 +7,7 @@ import { API_ENDPOINT } from '../constants';
 import { buildApiUrl, extractTotalCountHeader } from '../utilities';
 import { isWinnerRecord, isWinnerRecordsArray } from './type-guards';
 
-const DEFAULT_LIMIT = 5;
+export const DEFAULT_LIMIT = 10;
 const DEFAULT_PAGE = 1;
 export const DEFAULT_SORT_FIELD = 'id';
 export const DEFAULT_SORT_ORDER = 'ASC';

@@ -19,8 +19,8 @@ Async Race is a single-page application for managing a collection of cars and ru
 ```bash
 npm run build          # Compile TypeScript and build the project with Vite
 npm run dev            # Start Vite development server
-npm run format         # Check code formatting with Prettier
-npm run format:write   # Format code with Prettier and overwrite files
+npm run ci:format      # Check code formatting with Prettier
+npm run format         # Format code with Prettier and overwrite files
 npm run lint           # Run ESLint to check TypeScript files
 npm run lint:fix       # Run ESLint and automatically fix issues
 npm run prepare        # Setup Husky Git hooks

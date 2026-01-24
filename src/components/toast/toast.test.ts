@@ -1,79 +1,79 @@
+/* eslint-disable max-lines-per-function */
 /* eslint-disable @typescript-eslint/no-magic-numbers */
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { screen } from '@testing-library/dom';
-import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { toastStore } from '../../app/toast-store/toast-store';
-import { ToastContainer } from './toast';
+import '../../components/toast/toast';
+import { render } from '../../../__mocks__/test-utilities';
+import { toastStore } from '../../app/store/toast-store';
+import { ToastContainer } from '../../components/toast/toast';
 
-vi.mock('../../app/toast-store/toast-store', () => ({
-  toastStore: { getState: vi.fn(), setState: vi.fn(), subscribe: vi.fn() },
-}));
-
-vi.mock('../../shared/component/component', () => ({
-  Component: class {
-    public render(): HTMLElement {
-      return document.createElement('div');
-    }
-
-    public setState(): void {}
-  },
-  defineElement: vi.fn(),
-}));
-
-interface MockToastStore {
-  getState: Mock;
-  setState: Mock;
-  subscribe: Mock;
-}
-
-describe('ToastContainer', () => {
-  let mockToastStore: MockToastStore;
-
-  beforeEach((): void => {
-    mockToastStore = toastStore as unknown as MockToastStore;
-
-    vi.clearAllMocks();
+describe('ToastContainer (real lifecycle)', () => {
+  beforeEach(() => {
     document.body.innerHTML = '';
+    toastStore.setState({ toasts: [] });
   });
 
-  afterEach((): void => {
-    document.body.innerHTML = '';
-  });
+  it('render all toasts from store', async () => {
+    toastStore.setState({
+      toasts: [
+        { id: '1', message: 'success success', type: 'success' },
+        { id: '2', message: 'error error', type: 'error' },
+      ],
+    });
 
-  it('render all toasts from store', (): void => {
-    const mockToasts = [
-      { id: '1', message: 'success success', type: 'success' },
-      { id: '2', message: 'error error', type: 'error' },
-    ];
+    render(() => new ToastContainer());
 
-    mockToastStore.getState.mockReturnValue({ toasts: mockToasts });
-
-    const container = new ToastContainer();
-    const element = container.render();
-    document.body.append(element);
+    await Promise.resolve();
 
     expect(screen.getByText('success success')).toBeInTheDocument();
     expect(screen.getByText('error error')).toBeInTheDocument();
-    const buttons = screen.getAllByRole('button');
-    expect(buttons).toHaveLength(2);
+    expect(screen.getAllByRole('button')).toHaveLength(2);
   });
 
-  it('add CSS classes depends on toast type', (): void => {
-    const mockToasts = [
-      { id: '1', message: 'Test', type: 'success' },
-      { id: '2', message: 'Test 2', type: 'info' },
-    ];
+  it('add CSS classes depends on toast type', async () => {
+    toastStore.setState({
+      toasts: [
+        { id: '1', message: 'Test', type: 'success' },
+        { id: '2', message: 'Test 2', type: 'info' },
+      ],
+    });
 
-    mockToastStore.getState.mockReturnValue({ toasts: mockToasts });
-    const container = new ToastContainer();
-    const element = container.render();
+    const element = render(() => new ToastContainer());
 
-    const toastElements = element.querySelectorAll('[class*="toast"]');
+    await Promise.resolve();
 
-    expect(toastElements[0].className).toContain('toast');
-    expect(toastElements[0].className).toContain('success');
-    expect(toastElements[1].className).toContain('toast');
-    expect(toastElements[1].className).toContain('info');
+    const toasts = element.querySelectorAll<HTMLElement>('[data-testid="toast"]');
+
+    expect(toasts).toHaveLength(2);
+    expect(toasts[0].dataset.type).toBe('success');
+    expect(toasts[1].dataset.type).toBe('info');
+  });
+
+  it('removes toast on close button click', async () => {
+    toastStore.setState({
+      toasts: [
+        { id: '1', message: 'First', type: 'success' },
+        { id: '2', message: 'Second', type: 'info' },
+      ],
+    });
+
+    const element = render(() => new ToastContainer());
+
+    await Promise.resolve();
+
+    let toasts = element.querySelectorAll<HTMLElement>('[data-testid="toast"]');
+    expect(toasts).toHaveLength(2);
+
+    const firstToast = toasts[0];
+    const closeButton = firstToast.querySelector<HTMLElement>('[data-testid="toast-close"]');
+    if (closeButton) closeButton.click();
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    toasts = element.querySelectorAll<HTMLElement>('[data-testid="toast"]');
+
+    expect(toasts).toHaveLength(1);
+    expect(toasts[0].textContent).toContain('Second');
   });
 });
