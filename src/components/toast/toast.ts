@@ -1,6 +1,6 @@
 import { button, div } from '@ripetchor/dom';
 
-import { toastStore } from '../../app/toast-store/toast-store';
+import { toastStore } from '../../app/store/toast-store';
 import { Component, defineElement } from '../../shared/component/component';
 import styles from './toast.module.css';
 

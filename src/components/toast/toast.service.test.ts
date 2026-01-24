@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable unicorn/consistent-function-scoping */
 /* eslint-disable max-lines-per-function */
-import { toastStore } from '../../app/toast-store/toast-store';
+import { toastStore } from '../../app/store/toast-store';
 import { toastService } from './toast.service';
 describe('ToastService subscribe', () => {
   beforeEach(() => {

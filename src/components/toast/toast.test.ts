@@ -3,7 +3,7 @@
 import { screen } from '@testing-library/dom';
 import { afterEach, beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 
-import { toastStore } from '../../app/toast-store/toast-store';
+import { toastStore } from '../../app/store/toast-store';
 import { ToastContainer } from './toast';
 
 vi.mock('../../app/toast-store/toast-store', () => ({

@@ -1,4 +1,4 @@
-import { type Toast, toastStore } from '../../app/toast-store/toast-store';
+import { type Toast, toastStore } from '../../app/store/toast-store';
 
 export class ToastService {
   private store = toastStore;
