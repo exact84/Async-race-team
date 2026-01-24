@@ -44,18 +44,7 @@ export class GaragePage extends Component {
     );
   }
 
-  public render(): HTMLElement {
-    const trackControls = new TrackControls({ emitter: garageEmitter });
-
-    return main(
-      { className: 'page' },
-      h1(null, 'Garage: ', this.totalCarsSpan),
-      div({ className: styles.controls }, trackControls, this.pagination),
-      this.trackController.getView()
-    );
-  }
-
-  protected override connectedCallback(): void {
+  public override connectedCallback(): void {
     this.setupStoreSubscriptions();
 
     this.setupEmitterHandlers();
@@ -65,7 +54,7 @@ export class GaragePage extends Component {
     super.connectedCallback();
   }
 
-  protected disconnectedCallback(): void {
+  public disconnectedCallback(): void {
     this.trackController.deinitialize();
 
     for (const unsubscribe of this.unsubscribeFunctions) {
@@ -73,6 +62,17 @@ export class GaragePage extends Component {
     }
 
     this.unsubscribeFunctions.clear();
+  }
+
+  public render(): HTMLElement {
+    const trackControls = new TrackControls({ emitter: garageEmitter });
+
+    return main(
+      { className: 'page' },
+      h1(null, 'Garage: ', this.totalCarsSpan),
+      div({ className: styles.controls }, trackControls, this.pagination),
+      this.trackController.getView()
+    );
   }
 
   private setTotalCount(): void {

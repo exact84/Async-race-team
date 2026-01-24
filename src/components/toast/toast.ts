@@ -21,14 +21,19 @@ export class ToastContainer extends Component {
       { className: styles['toast-container'], id: 'toast-container' },
       ...toasts.map((toast) =>
         div(
-          { className: `${styles.toast} ${styles[toast.type]}` },
+          {
+            'className': `${styles.toast} ${styles[toast.type]}`,
+            'data-testid': 'toast',
+            'data-type': toast.type,
+          },
           toast.message,
           button(
             {
-              className: styles.close,
-              click: () => {
+              'className': styles.close,
+              'click': () => {
                 toastStore.setState((s) => ({ toasts: s.toasts.filter((t) => t.id !== toast.id) }));
               },
+              'data-testid': 'toast-close',
             },
             '✖'
           )

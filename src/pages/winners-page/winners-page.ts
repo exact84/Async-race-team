@@ -23,7 +23,9 @@ export class WinnersPage extends Component {
 
   public currentSort: SortField = DEFAULT_SORT_FIELD;
 
-  private readonly pagination: Pagination;
+  protected readonly pagination: Pagination;
+
+  protected tableController = new TableController();
 
   private table = new Table({
     fallbackMessage: 'Loading...',
@@ -31,8 +33,6 @@ export class WinnersPage extends Component {
     records: [],
     testid: 'winners-table',
   });
-
-  private tableController = new TableController();
 
   private readonly totalWinnersSpan = span(null);
 
@@ -52,6 +52,13 @@ export class WinnersPage extends Component {
     this.setupStoreSubscription();
     this.setTotalCount();
     super.connectedCallback();
+  }
+
+  public disconnectedCallback(): void {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+      this.unsubscribe = undefined;
+    }
   }
 
   public async getData(sort: SortField, order: SortOrder, page: number): Promise<void> {
@@ -90,13 +97,6 @@ export class WinnersPage extends Component {
       this.pagination,
       this.table
     );
-  }
-
-  protected disconnectedCallback(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-      this.unsubscribe = undefined;
-    }
   }
 
   private setTotalCount(): void {
