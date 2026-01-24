@@ -1,7 +1,7 @@
 import { div, h1, main, span } from '@ripetchor/dom';
 
 import { garageEmitter } from '../../app/garage-emitter/garage-emitter';
-import { garageStore } from '../../app/garage-store/garage-store';
+import { garageStore } from '../../app/store/garage-store';
 import { Pagination } from '../../components/pagination/pagination';
 import { toastService } from '../../components/toast/toast.service';
 import { TrackControls } from '../../components/track-controls/track-controls';
