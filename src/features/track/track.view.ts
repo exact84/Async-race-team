@@ -1,4 +1,4 @@
-import { div } from '@ripetchor/dom';
+import { div, p } from '@ripetchor/dom';
 
 import type { CarController } from '../car/car.controller';
 
@@ -19,7 +19,14 @@ export class TrackView extends Component<object, State> {
     this.className = styles.container;
   }
 
-  public render(): DocumentFragment {
+  public render(): DocumentFragment | HTMLElement {
+    if (this.state.carControllers.length === 0) {
+      return p(
+        { className: styles.fallbackMessage },
+        'You’ve removed all cars. Create some to get started.'
+      );
+    }
+
     return createFragment(
       ...this.state.carControllers.map((controller) => {
         const trackLane = div(
