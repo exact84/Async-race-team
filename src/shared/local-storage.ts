@@ -9,15 +9,19 @@ export function getFromLocalStorage<T>(
   typeGuard: TypeGuard<T>,
   fallback: T
 ): T {
-  const storageValue = localStorage.getItem(`${key}-${LS_SUFFIX}`);
+  try {
+    const storageValue = localStorage.getItem(`${key}-${LS_SUFFIX}`);
 
-  if (!storageValue) {
+    if (!storageValue) {
+      return fallback;
+    }
+
+    const parsedValue: unknown = JSON.parse(storageValue);
+
+    return typeGuard(parsedValue) ? parsedValue : fallback;
+  } catch {
     return fallback;
   }
-
-  const parsedValue: unknown = JSON.parse(storageValue);
-
-  return typeGuard(parsedValue) ? parsedValue : fallback;
 }
 
 export function setToLocalStorage(key: LocalStorageKey, value: unknown): void {
