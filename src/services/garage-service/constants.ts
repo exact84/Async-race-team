@@ -120,7 +120,7 @@ export const CARS = [
     ],
   },
   {
-    brand: 'Mercedes-AMG',
+    brand: 'Mercedes',
     models: [
       'AMG GT',
       'AMG GT S',
