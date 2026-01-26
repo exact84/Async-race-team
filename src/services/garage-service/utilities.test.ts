@@ -1,4 +1,4 @@
-import { CAR_BRANDS, CAR_MODELS } from './constants';
+import { CARS } from './constants';
 import { createRandomCar } from './utilities';
 
 describe(createRandomCar.name, () => {
@@ -12,10 +12,13 @@ describe(createRandomCar.name, () => {
   it('should generate a name containing a valid brand and model', () => {
     const car = createRandomCar();
 
-    const brandMatch = CAR_BRANDS.some((brand) => car.name.startsWith(brand));
-    expect(brandMatch).toBe(true);
+    const match = CARS.some(({ brand, models }) => {
+      const brandMatch = car.name.startsWith(brand);
+      const modelMatch = models.some((model) => car.name.endsWith(model));
 
-    const modelMatch = CAR_MODELS.some((model) => car.name.endsWith(model));
-    expect(modelMatch).toBe(true);
+      return brandMatch && modelMatch;
+    });
+
+    expect(match).toBe(true);
   });
 });

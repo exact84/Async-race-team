@@ -23,6 +23,12 @@
   color: var(--color-dark-gray);
 }
 
+@media (width <= 768px) {
+  .toast {
+    max-width: 80dvw;
+  }
+}
+
 .toast.success {
   justify-self: end;
   background: lightgreen;

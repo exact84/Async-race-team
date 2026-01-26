@@ -25,7 +25,7 @@ export class TableController {
         sortable: this.isSortField(key),
         sorted:
           key === sort && order !== undefined ? (order === 'ASC' ? 'ASC' : 'DESC') : undefined,
-        colSize: key === 'name' ? 'lg' : 'md',
+        colSize: key === 'name' ? 'lg' : key === 'id' ? 'sm' : 'md',
       };
     });
 

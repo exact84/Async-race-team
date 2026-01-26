@@ -20,7 +20,7 @@ export function getRandomHexColor(): string {
   return color;
 }
 
-export function getRandomItem<T>(array: T[]): T {
+export function getRandomItem<T>(array: readonly T[]): T {
   const index = Math.floor(Math.random() * array.length);
 
   return array[index];
