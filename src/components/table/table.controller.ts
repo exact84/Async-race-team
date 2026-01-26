@@ -33,7 +33,6 @@ export class TableController {
   }
 
   private isSortField(value: string): boolean {
-    // or I need an enum ((
     return ['id', 'time', 'wins'].includes(value);
   }
 
