@@ -35,6 +35,7 @@ export class TrackControls extends Component<TrackControlProperties> {
           this.props.emitter.emit('garage:create-one', { color: data.color, name: data.name });
           carForm.remove();
           modal.close();
+          garageStore.setState({ createCarFields: { color: '', id: Number.NaN, name: '' } });
         },
       });
 
