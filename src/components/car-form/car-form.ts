@@ -95,6 +95,12 @@ export class CarForm extends Component<CarFormProperties> {
     // }
   }
 
+  public getFormData(): Car {
+    const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
+
+    return { color: this.inputColor.value, id, name: this.inputName.value.trim() };
+  }
+
   public render(): DocumentFragment | HTMLElement {
     return this.formElement;
   }
@@ -112,9 +118,9 @@ export class CarForm extends Component<CarFormProperties> {
   private handleSubmit(event: SubmitEvent): void {
     event.preventDefault();
 
-    const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
+    const { color, id, name } = this.getFormData();
 
-    this.props.onSubmit({ color: this.inputColor.value, id, name: this.inputName.value.trim() });
+    this.props.onSubmit({ color, id, name });
   }
 
   private updateSubmitButtonState(): void {
