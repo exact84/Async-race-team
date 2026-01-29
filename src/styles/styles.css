@@ -1,0 +1,87 @@
+:root {
+  --color-dark-gray: #333;
+  --color-light-gray: #aaa;
+  --color-dark: #121212;
+  --color-light: #eee;
+  --color-blue-light: #2747a6;
+  --color-blue-dark: #1e3a8a;
+  --color-rebeccapurple: rebeccapurple;
+  --color-purple: #9575cd;
+  --transition-duration: 0.3s;
+
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: var(--color-dark);
+    --fg-color: var(--color-light);
+    --table-color-odd: var(--color-dark-gray);
+    --table-color-even: var(--color-light-gray);
+    --accent-color: var(--color-blue-dark);
+    --accent-color-hover: var(--color-blue-light);
+    --header-bg: var(--color-dark-gray);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg-color: var(--color-light);
+    --fg-color: var(--color-dark);
+    --table-color-odd: var(--color-light-gray);
+    --table-color-even: var(--color-dark-gray);
+    --accent-color: var(--color-rebeccapurple);
+    --accent-color-hover: var(--color-purple);
+    --header-bg: var(--color-light-gray);
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg-color: var(--color-dark);
+  --fg-color: var(--color-light);
+  --table-color-odd: var(--color-dark-gray);
+  --table-color-even: var(--color-light-gray);
+  --accent-color: var(--color-blue-dark);
+  --accent-color-hover: var(--color-blue-light);
+  --header-bg: var(--color-dark-gray);
+
+  color-scheme: dark;
+}
+
+:root[data-theme='light'] {
+  --bg-color: var(--color-light);
+  --fg-color: var(--color-dark);
+  --table-color-odd: var(--color-light-gray);
+  --table-color-even: var(--color-dark-gray);
+  --accent-color: var(--color-rebeccapurple);
+  --accent-color-hover: var(--color-purple);
+  --header-bg: var(--color-light-gray);
+
+  color-scheme: light;
+}
+
+html {
+  scrollbar-gutter: stable;
+  font-size: 62.5%;
+}
+
+html,
+body {
+  min-height: 100%;
+  font-family: sans-serif;
+}
+
+* {
+  scrollbar-width: thin;
+}
+
+body {
+  margin: 0;
+  font-size: 1.6rem;
+  color: var(--fg-color);
+  background-color: var(--bg-color);
+}
+
+.no-scroll {
+  overflow: hidden;
+}

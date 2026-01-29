@@ -1,0 +1,92 @@
+/* eslint-disable perfectionist/sort-interfaces */
+import { caption, span, table, tbody, td, th, thead, tr } from '@ripetchor/dom';
+
+import type { SortOrder } from '../../services/winners-service/types';
+
+import { Component, defineElement } from '../../shared/component/component';
+import { prettifyHeader } from './helper';
+import styles from './table.module.css';
+
+export interface TableCell {
+  kind: 'img' | 'text';
+  meta?: { className?: string; color?: string; tooltip?: string };
+  value: HTMLElement | number | string;
+}
+
+export interface TableHeader {
+  key: string;
+  sortable: boolean;
+  sorted?: SortOrder;
+  colSize?: 'lg' | 'md' | 'sm';
+}
+export interface TableProperties {
+  onClick?(): void;
+  onSort?(field: string): void;
+  stickyHeader?: boolean;
+  testid: string;
+  headers: TableHeader[];
+  records: TableRecord[];
+  fallbackMessage?: string;
+}
+
+export interface TableRecord {
+  cells: TableCell[];
+}
+
+export class Table extends Component<TableProperties> {
+  private abortController = new AbortController();
+
+  public render(): HTMLElement {
+    return table(
+      {
+        'className': styles.table,
+        'data-testid': this.props.testid,
+        'signal': this.abortController.signal,
+      },
+      ...(this.props.records.length > 0
+        ? [this.createThead(), this.createTbody()]
+        : [caption({ className: styles.fallbackMessage }, this.props.fallbackMessage)])
+    );
+  }
+
+  private createTbody(): HTMLElement {
+    return tbody(
+      { className: styles.tbody },
+      ...this.props.records.map((record) =>
+        tr(
+          { className: styles.tr },
+          ...record.cells.map((cell) =>
+            td({ className: styles.td, title: cell.meta?.tooltip }, cell.value)
+          )
+        )
+      )
+    );
+  }
+
+  private createThead(): HTMLElement {
+    return thead(
+      { className: this.props.stickyHeader ? `${styles.thead} ${styles.sticky}` : styles.thead },
+      ...this.props.headers.map((header) => {
+        const classNames = [styles.th];
+        if (header.sortable) classNames.push(styles.sortable);
+        if (header.colSize) classNames.push(styles[header.colSize]);
+        return th(
+          {
+            className: classNames.join(' '),
+            click: () => {
+              if (!header.sortable) return;
+              this.props.onSort?.(header.key);
+            },
+          },
+          prettifyHeader(header.key),
+          span(
+            { className: styles.span_sortable },
+            header.sortable ? (header.sorted ? (header.sorted === 'ASC' ? ' ↑' : ' ↓') : ' ↕') : ''
+          )
+        );
+      })
+    );
+  }
+}
+
+defineElement('table', Table);

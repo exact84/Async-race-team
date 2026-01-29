@@ -1,0 +1,30 @@
+.container {
+  display: block;
+  width: max-content;
+  background-color: transparent;
+}
+
+.icon {
+  transform: rotateY(180deg);
+
+  background-color: transparent;
+
+  mask-image: url('../../assets/car.svg');
+  mask-repeat: no-repeat;
+  mask-size: contain;
+}
+
+.sm {
+  width: 50px;
+  height: 25px;
+}
+
+.md {
+  width: 60px;
+  height: 30px;
+}
+
+.lg {
+  width: 80px;
+  height: 40px;
+}

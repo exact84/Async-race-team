@@ -1,0 +1,117 @@
+import { div, form, input, label } from '@ripetchor/dom';
+
+import type { Car } from '../../services/garage-service/types';
+
+import { Component, defineElement } from '../../shared/component/component';
+import { Button } from '../button/button';
+import { CarImage } from '../car-image/car-image';
+import styles from './car-form.module.css';
+
+export type CarFormProperties = Car & { mode: 'create' | 'update'; onSubmit: FormSubmitCallback };
+
+type FormSubmitCallback = (car: Car) => void;
+
+export class CarForm extends Component<CarFormProperties> {
+  private readonly abortController = new AbortController();
+
+  private readonly buttonSubmit = new Button({
+    testid: 'button-submit-car-form',
+    textContent: 'Submit',
+  });
+
+  private readonly carImage = new CarImage({ color: 'white', size: 'lg' });
+
+  private readonly inputColor = input({
+    'change': (event) => {
+      this.carImage.setColor(event.currentTarget.value);
+    },
+    'data-testid': 'input-car-color',
+    'id': 'car-color',
+    'signal': this.abortController.signal,
+    'type': 'color',
+  });
+
+  private readonly labelColor = label(
+    { className: styles.label, htmlFor: 'car-color' },
+    'Color',
+    this.inputColor
+  );
+
+  private readonly inputName = input({
+    'className': styles.input,
+    'data-testid': 'input-car-name',
+    'id': 'car-name',
+    'input': () => {
+      this.updateSubmitButtonState();
+    },
+    'signal': this.abortController.signal,
+    'type': 'text',
+  });
+
+  private readonly labelName = label(
+    { className: styles.label, htmlFor: 'car-name' },
+    'Name',
+    this.inputName
+  );
+
+  private readonly formElement = form(
+    {
+      'className': styles.form,
+      'data-testid': 'input-car-form',
+      'signal': this.abortController.signal,
+      'submit': (event) => {
+        this.handleSubmit(event);
+      },
+    },
+    div(
+      { className: styles.inputsContainer },
+      div({ className: styles.labelsContainer }, this.labelName, this.labelColor),
+      this.carImage
+    ),
+    this.buttonSubmit
+  );
+
+  public constructor(properties: CarFormProperties) {
+    super(properties);
+
+    this.carImage.setColor(properties.color);
+    this.inputColor.value = properties.color;
+    this.inputName.value = properties.name;
+  }
+
+  public getFormData(): Car {
+    const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
+
+    return { color: this.inputColor.value, id, name: this.inputName.value.trim() };
+  }
+
+  public render(): DocumentFragment | HTMLElement {
+    return this.formElement;
+  }
+
+  protected override connectedCallback(): void {
+    super.connectedCallback();
+
+    this.inputName.focus();
+  }
+
+  protected disconnectedCallback(): void {
+    this.abortController.abort();
+  }
+
+  private handleSubmit(event: SubmitEvent): void {
+    event.preventDefault();
+
+    const { color, id, name } = this.getFormData();
+
+    this.props.onSubmit({ color, id, name });
+  }
+
+  private updateSubmitButtonState(): void {
+    const isDisabled = this.inputName.value.trim().length === 0;
+
+    this.buttonSubmit.toggleDisabled(isDisabled);
+  }
+}
+
+defineElement('car-form', CarForm);

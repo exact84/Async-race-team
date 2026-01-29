@@ -1,0 +1,22 @@
+.app {
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 20px;
+}
+
+@media (width <= 768px) {
+  .app {
+    padding: 10px;
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 10px;
+  border-radius: 4px;
+
+  background-color: var(--header-bg);
+}

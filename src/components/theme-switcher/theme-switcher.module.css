@@ -1,0 +1,23 @@
+.container {
+  display: flex;
+  gap: 10px;
+  width: max-content;
+}
+
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 1.4rem;
+}
+
+.input {
+  accent-color: var(--accent-color);
+}
+
+@media (hover: hover) {
+  .label,
+  .input {
+    cursor: pointer;
+  }
+}

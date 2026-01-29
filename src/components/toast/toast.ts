@@ -1,0 +1,46 @@
+import { button, div } from '@ripetchor/dom';
+
+import { toastStore } from '../../app/store/toast-store';
+import { Component, defineElement } from '../../shared/component/component';
+import styles from './toast.module.css';
+
+export class ToastContainer extends Component {
+  public constructor() {
+    super();
+    toastStore.subscribe(
+      (state) => state.toasts,
+      () => {
+        this.setState({});
+      }
+    );
+  }
+
+  public render(): HTMLElement {
+    const toasts = toastStore.getState().toasts;
+    return div(
+      { className: styles['toast-container'], id: 'toast-container' },
+      ...toasts.map((toast) =>
+        div(
+          {
+            'className': `${styles.toast} ${styles[toast.type]}`,
+            'data-testid': 'toast',
+            'data-type': toast.type,
+          },
+          toast.message,
+          button(
+            {
+              'className': styles.close,
+              'click': () => {
+                toastStore.setState((s) => ({ toasts: s.toasts.filter((t) => t.id !== toast.id) }));
+              },
+              'data-testid': 'toast-close',
+            },
+            '✖'
+          )
+        )
+      )
+    );
+  }
+}
+
+defineElement('toast-container', ToastContainer);

@@ -1,0 +1,348 @@
+import { div } from '@ripetchor/dom';
+
+import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
+import type { DriveMetrics, DriveResult } from '../../services/engine-service/types';
+import type { Car } from '../../services/garage-service/types';
+import type { Emitter } from '../../shared/emitter/emitter';
+
+import { garageStore } from '../../app/store/garage-store';
+import { Button } from '../../components/button/button';
+import { CarForm } from '../../components/car-form/car-form';
+import { CarImage } from '../../components/car-image/car-image';
+import { Modal } from '../../components/modal/modal';
+import { toastService } from '../../components/toast/toast.service';
+import { Component, defineElement } from '../../shared/component/component';
+import { createFragment, isAbortError } from '../../shared/utilities';
+import styles from './car.view.module.css';
+
+export interface CarViewCallbacks {
+  onDelete(): Promise<object>;
+  onDrive(signal: AbortSignal): Promise<DriveResult>;
+  onStop(): Promise<DriveMetrics>;
+  onUpdate(data: Omit<Car, 'id'>): Promise<Car>;
+}
+
+interface State {
+  color: string;
+  name: string;
+}
+
+const CROSS_LINE_WIDTH = 20;
+
+interface CarViewProperties {
+  car: Car;
+  emitter: Emitter<GaragePageEvents> | null;
+}
+
+export class CarView extends Component<CarViewProperties, State> {
+  private abortController: AbortController | null = null;
+
+  private animation: Animation | null = null;
+
+  private buttonDelete = new Button({
+    buttonSize: 'sm',
+    testid: 'button-delete',
+    textContent: 'Delete',
+  });
+
+  private buttonStart = new Button({
+    buttonSize: 'sm',
+    testid: 'button-start',
+    textContent: 'Start',
+  });
+
+  private buttonStop = new Button({ buttonSize: 'sm', testid: 'button-stop', textContent: 'Stop' });
+
+  private buttonUpdate = new Button({
+    buttonSize: 'sm',
+    testid: 'button-update',
+    textContent: 'Update',
+  });
+
+  private callbacks: CarViewCallbacks | null = null;
+
+  private carImage: CarImage | null = null;
+
+  private driveMetrics: DriveMetrics | null = null;
+
+  private onRemove: null | VoidFunction = null;
+
+  private readonly unsubscribeFunctions = new Set<VoidFunction>();
+
+  public constructor(properties: CarViewProperties) {
+    super(properties);
+
+    this.state = { color: this.props.car.color, name: this.props.car.name };
+
+    this.className = styles.container;
+
+    this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+
+    this.setupListeners();
+  }
+
+  public getAbortSignal(): AbortSignal {
+    this.abortController ??= new AbortController();
+
+    return this.abortController.signal;
+  }
+
+  public getCarData(): Car {
+    return { color: this.state.color, id: this.props.car.id, name: this.state.name };
+  }
+
+  public pauseAnimation(): void {
+    if (this.animation) {
+      this.animation.pause();
+    }
+  }
+
+  public render(): DocumentFragment {
+    this.abortController?.abort();
+    this.abortController = null;
+
+    this.abortController = new AbortController();
+
+    this.initializeButtonListeners();
+
+    this.carImage = new CarImage({ color: this.state.color, size: 'md' });
+
+    return createFragment(
+      div(null, this.state.name),
+      this.carImage,
+      div(
+        { className: styles.buttonsContainer },
+        this.buttonStart,
+        this.buttonStop,
+        this.buttonUpdate,
+        this.buttonDelete
+      )
+    );
+  }
+
+  public setButtonsState(options: {
+    delete?: boolean;
+    start?: boolean;
+    stop?: boolean;
+    update?: boolean;
+  }): void {
+    const defaultValue = false;
+
+    this.buttonDelete.toggleDisabled(options.delete ?? defaultValue);
+    this.buttonStart.toggleDisabled(options.start ?? defaultValue);
+    this.buttonStop.toggleDisabled(options.stop ?? defaultValue);
+    this.buttonUpdate.toggleDisabled(options.update ?? defaultValue);
+  }
+
+  public setCallbacks(callbacks: CarViewCallbacks): void {
+    this.callbacks = callbacks;
+  }
+
+  public setDriveMetrics(driveMetrics: DriveMetrics): void {
+    this.driveMetrics = driveMetrics;
+  }
+
+  public setOnRemove(callback: VoidFunction): void {
+    this.onRemove = callback;
+  }
+
+  public startAnimation(): void {
+    if (!this.carImage || !this.driveMetrics) {
+      return;
+    }
+
+    const endWidth = this.clientWidth - this.carImage.clientWidth - CROSS_LINE_WIDTH;
+
+    const duration = this.driveMetrics.distance / this.driveMetrics.velocity;
+
+    const animationData = { transform: ['translateX(0)', `translateX(${endWidth.toString()}px)`] };
+
+    if (this.animation) {
+      this.animation.cancel();
+      this.animation = null;
+    }
+
+    this.animation = this.carImage.animate(animationData, { duration });
+
+    this.animation.addEventListener(
+      'finish',
+      () => {
+        if (!this.carImage) {
+          return;
+        }
+
+        this.carImage.style.transform = `translateX(${endWidth.toString()}px)`;
+
+        this.animation = null;
+      },
+      { once: true }
+    );
+  }
+
+  public stopAnimation(): void {
+    if (!this.carImage) {
+      return;
+    }
+
+    this.carImage.style.transform = 'translateX(0)';
+
+    if (this.animation) {
+      this.animation.cancel();
+      this.animation = null;
+    }
+  }
+
+  protected disconnectedCallback(): void {
+    this.abortController?.abort();
+    this.abortController = null;
+
+    for (const unsubscribe of this.unsubscribeFunctions) {
+      unsubscribe();
+    }
+
+    this.unsubscribeFunctions.clear();
+  }
+
+  private initializeButtonListeners(): void {
+    this.buttonStart.addEventListener(
+      'click',
+      () => {
+        void this.onStartButtonClick();
+      },
+      { signal: this.getAbortSignal() }
+    );
+
+    this.buttonStop.addEventListener(
+      'click',
+      () => {
+        void this.onStopButtonClick();
+      },
+      { signal: this.getAbortSignal() }
+    );
+
+    this.buttonDelete.addEventListener(
+      'click',
+      () => {
+        void this.onDeleteButtonClick();
+      },
+      { signal: this.getAbortSignal() }
+    );
+
+    this.buttonUpdate.addEventListener(
+      'click',
+      () => {
+        this.onUpdateButtonClick();
+      },
+      { signal: this.getAbortSignal() }
+    );
+  }
+
+  private async onDeleteButtonClick(): Promise<void> {
+    this.setButtonsState({ delete: true, start: true, stop: true, update: true });
+
+    try {
+      await this.callbacks?.onDelete();
+
+      this.remove();
+
+      this.onRemove?.();
+    } catch {
+      toastService.show({ message: `Failed to delete ${this.state.name}`, type: 'error' });
+      this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+    }
+  }
+
+  private onFormSubmit(carData: Car, modal: Modal, carForm: CarForm): void {
+    this.callbacks
+      ?.onUpdate({ color: carData.color, name: carData.name })
+      .then(() => {
+        this.setState({ color: carData.color, name: carData.name });
+        garageStore.setState((previous) => ({
+          ...previous,
+          updateCarFields: { ...previous.updateCarFields, [carData.id]: carForm.getFormData() },
+        }));
+      })
+      .catch(() => {
+        toastService.show({ message: `Failed to update ${this.state.name}`, type: 'error' });
+      })
+      .finally(() => {
+        modal.close();
+        this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+      });
+  }
+
+  private async onStartButtonClick(): Promise<void> {
+    this.setButtonsState({ delete: true, start: true, stop: false, update: true });
+
+    try {
+      await this.callbacks?.onDrive(this.getAbortSignal());
+    } catch {
+      this.pauseAnimation();
+    } finally {
+      this.setButtonsState({ delete: true, start: true, stop: false, update: true });
+    }
+  }
+
+  private async onStopButtonClick(): Promise<void> {
+    this.setButtonsState({ delete: true, start: true, stop: true, update: true });
+
+    try {
+      await this.callbacks?.onStop();
+
+      this.stopAnimation();
+    } catch (error: unknown) {
+      if (!isAbortError(error)) {
+        toastService.show({ message: `Failed to stop ${this.state.name}`, type: 'error' });
+      }
+    } finally {
+      this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+    }
+  }
+
+  private onUpdateButtonClick(): void {
+    this.setButtonsState({ delete: true, start: true, stop: true, update: true });
+
+    const { id } = this.getCarData();
+    const { color, name } = this.state;
+    const updateCarFields = garageStore.getState().updateCarFields;
+
+    const existingCar = updateCarFields[id];
+
+    const carId = existingCar ? existingCar.id : id;
+    const carColor = existingCar ? existingCar.color : color;
+    const carName = existingCar ? existingCar.name : name;
+
+    const modal = new Modal({
+      onClose: (): void => {
+        this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+        garageStore.setState((previous) => ({
+          ...previous,
+          updateCarFields: { ...previous.updateCarFields, [id]: carForm.getFormData() },
+        }));
+      },
+      title: 'Update car',
+    });
+
+    const carForm = new CarForm({
+      color: carColor,
+      id: carId,
+      mode: 'update',
+      name: carName,
+      onSubmit: (carData): void => {
+        this.onFormSubmit(carData, modal, carForm);
+      },
+    });
+
+    modal.open(() => carForm);
+  }
+
+  private setupListeners(): void {
+    this.props.emitter?.on('race:start', () => {
+      requestIdleCallback(() => {
+        this.setButtonsState({ delete: true, start: true, stop: true, update: true });
+      });
+    });
+  }
+}
+
+defineElement('car', CarView);

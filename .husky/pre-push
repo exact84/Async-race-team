@@ -1,0 +1,2 @@
+npm test
+npx validate-branch-name -r "^(feature|fix|chore|refactor)\\/([a-z0-9-]+)$"
