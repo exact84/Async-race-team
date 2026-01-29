@@ -2,22 +2,20 @@ import { div, form, input, label } from '@ripetchor/dom';
 
 import type { Car } from '../../services/garage-service/types';
 
-import { createRandomCar } from '../../services/garage-service/utilities';
+// import { createRandomCar } from '../../services/garage-service/utilities';
 import { Component, defineElement } from '../../shared/component/component';
 import { Button } from '../button/button';
 import { CarImage } from '../car-image/car-image';
 import styles from './car-form.module.css';
 
-export type CarFormProperties = CreateFormProperties | UpdateFormProperties;
+// export type CarFormProperties = CreateFormProperties | UpdateFormProperties;
+export type CarFormProperties = Car & { mode: 'create' | 'update'; onSubmit: FormSubmitCallback };
 
-interface CreateFormProperties {
-  mode: 'create';
-  onSubmit: FormSubmitCallback;
-}
+// type CreateFormProperties = Car & { mode: 'create'; onSubmit: FormSubmitCallback };
 
 type FormSubmitCallback = (car: Car) => void;
 
-type UpdateFormProperties = Car & { mode: 'update'; onSubmit: FormSubmitCallback };
+// type UpdateFormProperties = Car & { mode: 'update'; onSubmit: FormSubmitCallback };
 
 export class CarForm extends Component<CarFormProperties> {
   private readonly abortController = new AbortController();
@@ -82,19 +80,19 @@ export class CarForm extends Component<CarFormProperties> {
   public constructor(properties: CarFormProperties) {
     super(properties);
 
-    if (properties.mode === 'create') {
-      const { color, name } = createRandomCar();
+    // if (properties.mode === 'create') {
+    //   const { color, name } = createRandomCar();
 
-      this.carImage.setColor(color);
-      this.inputColor.value = color;
-      this.inputName.value = name;
-    }
+    //   this.carImage.setColor(color);
+    //   this.inputColor.value = color;
+    //   this.inputName.value = name;
+    // }
 
-    if (properties.mode === 'update') {
-      this.carImage.setColor(properties.color);
-      this.inputColor.value = properties.color;
-      this.inputName.value = properties.name;
-    }
+    // if (properties.mode === 'update') {
+    this.carImage.setColor(properties.color);
+    this.inputColor.value = properties.color;
+    this.inputName.value = properties.name;
+    // }
   }
 
   public render(): DocumentFragment | HTMLElement {
