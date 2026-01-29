@@ -2,22 +2,14 @@ import { div, form, input, label } from '@ripetchor/dom';
 
 import type { Car } from '../../services/garage-service/types';
 
-import { createRandomCar } from '../../services/garage-service/utilities';
 import { Component, defineElement } from '../../shared/component/component';
 import { Button } from '../button/button';
 import { CarImage } from '../car-image/car-image';
 import styles from './car-form.module.css';
 
-export type CarFormProperties = CreateFormProperties | UpdateFormProperties;
-
-interface CreateFormProperties {
-  mode: 'create';
-  onSubmit: FormSubmitCallback;
-}
+export type CarFormProperties = Car & { mode: 'create' | 'update'; onSubmit: FormSubmitCallback };
 
 type FormSubmitCallback = (car: Car) => void;
-
-type UpdateFormProperties = Car & { mode: 'update'; onSubmit: FormSubmitCallback };
 
 export class CarForm extends Component<CarFormProperties> {
   private readonly abortController = new AbortController();
@@ -82,19 +74,15 @@ export class CarForm extends Component<CarFormProperties> {
   public constructor(properties: CarFormProperties) {
     super(properties);
 
-    if (properties.mode === 'create') {
-      const { color, name } = createRandomCar();
+    this.carImage.setColor(properties.color);
+    this.inputColor.value = properties.color;
+    this.inputName.value = properties.name;
+  }
 
-      this.carImage.setColor(color);
-      this.inputColor.value = color;
-      this.inputName.value = name;
-    }
+  public getFormData(): Car {
+    const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
 
-    if (properties.mode === 'update') {
-      this.carImage.setColor(properties.color);
-      this.inputColor.value = properties.color;
-      this.inputName.value = properties.name;
-    }
+    return { color: this.inputColor.value, id, name: this.inputName.value.trim() };
   }
 
   public render(): DocumentFragment | HTMLElement {
@@ -114,9 +102,9 @@ export class CarForm extends Component<CarFormProperties> {
   private handleSubmit(event: SubmitEvent): void {
     event.preventDefault();
 
-    const id = this.props.mode === 'update' ? this.props.id : Number.NaN;
+    const { color, id, name } = this.getFormData();
 
-    this.props.onSubmit({ color: this.inputColor.value, id, name: this.inputName.value.trim() });
+    this.props.onSubmit({ color, id, name });
   }
 
   private updateSubmitButtonState(): void {

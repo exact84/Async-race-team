@@ -5,6 +5,7 @@ import type { DriveMetrics, DriveResult } from '../../services/engine-service/ty
 import type { Car } from '../../services/garage-service/types';
 import type { Emitter } from '../../shared/emitter/emitter';
 
+import { garageStore } from '../../app/store/garage-store';
 import { Button } from '../../components/button/button';
 import { CarForm } from '../../components/car-form/car-form';
 import { CarImage } from '../../components/car-image/car-image';
@@ -251,6 +252,25 @@ export class CarView extends Component<CarViewProperties, State> {
     }
   }
 
+  private onFormSubmit(carData: Car, modal: Modal, carForm: CarForm): void {
+    this.callbacks
+      ?.onUpdate({ color: carData.color, name: carData.name })
+      .then(() => {
+        this.setState({ color: carData.color, name: carData.name });
+        garageStore.setState((previous) => ({
+          ...previous,
+          updateCarFields: { ...previous.updateCarFields, [carData.id]: carForm.getFormData() },
+        }));
+      })
+      .catch(() => {
+        toastService.show({ message: `Failed to update ${this.state.name}`, type: 'error' });
+      })
+      .finally(() => {
+        modal.close();
+        this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+      });
+  }
+
   private async onStartButtonClick(): Promise<void> {
     this.setButtonsState({ delete: true, start: true, stop: false, update: true });
 
@@ -284,33 +304,32 @@ export class CarView extends Component<CarViewProperties, State> {
 
     const { id } = this.getCarData();
     const { color, name } = this.state;
+    const updateCarFields = garageStore.getState().updateCarFields;
+
+    const existingCar = updateCarFields[id];
+
+    const carId = existingCar ? existingCar.id : id;
+    const carColor = existingCar ? existingCar.color : color;
+    const carName = existingCar ? existingCar.name : name;
 
     const modal = new Modal({
       onClose: (): void => {
         this.setButtonsState({ delete: false, start: false, stop: true, update: false });
+        garageStore.setState((previous) => ({
+          ...previous,
+          updateCarFields: { ...previous.updateCarFields, [id]: carForm.getFormData() },
+        }));
       },
       title: 'Update car',
     });
 
     const carForm = new CarForm({
-      color,
-      id,
+      color: carColor,
+      id: carId,
       mode: 'update',
-      name,
+      name: carName,
       onSubmit: (carData): void => {
-        this.callbacks
-          ?.onUpdate({ color: carData.color, name: carData.name })
-          .then(() => {
-            this.setState({ color: carData.color, name: carData.name });
-          })
-          .catch(() => {
-            toastService.show({ message: `Failed to update ${this.state.name}`, type: 'error' });
-          })
-          .finally(() => {
-            carForm.remove();
-            modal.close();
-            this.setButtonsState({ delete: false, start: false, stop: true, update: false });
-          });
+        this.onFormSubmit(carData, modal, carForm);
       },
     });
 

@@ -1,6 +1,7 @@
 import type { GaragePageEvents } from '../../app/garage-emitter/garage-emitter';
 import type { Emitter } from '../../shared/emitter/emitter';
 
+import { garageStore } from '../../app/store/garage-store';
 import { Component, defineElement } from '../../shared/component/component';
 import { createFragment } from '../../shared/utilities';
 import { Button } from '../button/button';
@@ -23,17 +24,26 @@ export class TrackControls extends Component<TrackControlProperties> {
 
   private readonly buttonCreateOne = new Button({
     onClick: (): void => {
-      const modal = new Modal({ title: 'Create car' });
+      const { color, id, name } = garageStore.getState().createCarFields;
 
       const carForm = new CarForm({
+        color,
+        id,
         mode: 'create',
+        name,
         onSubmit: (data): void => {
           this.props.emitter.emit('garage:create-one', { color: data.color, name: data.name });
-
           carForm.remove();
-
           modal.close();
+          garageStore.setState({ createCarFields: { color: '', id: Number.NaN, name: '' } });
         },
+      });
+
+      const modal = new Modal({
+        onClose: (): void => {
+          garageStore.setState({ createCarFields: carForm.getFormData() });
+        },
+        title: 'Create car',
       });
 
       modal.open(() => carForm);

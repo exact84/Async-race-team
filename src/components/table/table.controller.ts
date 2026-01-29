@@ -8,6 +8,7 @@ import { CarImage } from '../car-image/car-image';
 
 const COLOR_FIELD: keyof WinnerWithCarData = 'color';
 const TIME_FIELD: keyof WinnerWithCarData = 'time';
+const PRECISION_DIGITS = 2;
 
 export class TableController {
   private abortController = new AbortController();
@@ -53,7 +54,9 @@ export class TableController {
     if (data.length === 0) return { headers: [], rows: [] };
 
     const headers = this.getTableHeaders(WINNERS_COLUMNS, sort, order);
-    const rows: TableRecord[] = data.map((item) => this.mapRecordToCells(item, WINNERS_COLUMNS));
+    const rows: TableRecord[] = data
+      .filter((item) => !Number.isNaN(item.id))
+      .map((item) => this.mapRecordToCells(item, WINNERS_COLUMNS));
 
     return { headers, rows };
   }
@@ -70,7 +73,8 @@ export class TableController {
           };
         }
         case TIME_FIELD: {
-          return { kind: 'text', value: `${String(raw)}s` };
+          const time = Number(raw).toFixed(PRECISION_DIGITS);
+          return { kind: 'text', value: `${time}s` };
         }
 
         default: {
