@@ -10,13 +10,17 @@ vi.mock('../../services/garage-service/utilities', () => {
 });
 
 it('should render to DOM', () => {
-  const component = render(() => new CarForm({ mode: 'create', onSubmit: vi.fn() }));
+  const component = render(
+    () => new CarForm({ mode: 'create', onSubmit: vi.fn(), ...MOCK_SINGLE_CAR })
+  );
 
   expect(component).toBeInTheDocument();
 });
 
 it('mode:create - should fill inputs with random values', () => {
-  const component = render(() => new CarForm({ mode: 'create', onSubmit: vi.fn() }));
+  const component = render(
+    () => new CarForm({ mode: 'create', onSubmit: vi.fn(), ...MOCK_SINGLE_CAR })
+  );
 
   const inputName = getByTestId(component, 'input-car-name');
   const inputColor = getByTestId(component, 'input-car-color');
@@ -42,7 +46,9 @@ it('should submit with user typed value', async () => {
 
   const onSubmitMock = vi.fn();
 
-  const component = render(() => new CarForm({ mode: 'create', onSubmit: onSubmitMock }));
+  const component = render(
+    () => new CarForm({ mode: 'create', onSubmit: onSubmitMock, ...MOCK_SINGLE_CAR })
+  );
 
   const inputName = getByTestId(component, 'input-car-name');
   const inputColor = getByTestId(component, 'input-car-color');
