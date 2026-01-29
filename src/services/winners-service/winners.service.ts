@@ -12,6 +12,14 @@ const DEFAULT_PAGE = 1;
 export const DEFAULT_SORT_FIELD = 'id';
 export const DEFAULT_SORT_ORDER = 'ASC';
 
+const FALLBACK_WINNER_DATA: WinnerWithCarData = {
+  color: '',
+  id: Number.NaN,
+  name: '',
+  time: 0,
+  wins: 0,
+};
+
 export class WinnersService {
   private static instance: null | WinnersService = null;
 
@@ -82,7 +90,8 @@ export class WinnersService {
               name: car.name,
               time: record.time,
               wins: record.wins,
-            }));
+            }))
+            .catch(() => FALLBACK_WINNER_DATA);
         })
       );
     });
