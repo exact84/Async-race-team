@@ -6,12 +6,12 @@ interface State {
   createCarFields: Car;
   currentPage: number;
   totalCount: number;
-  updateCarFields: Car;
+  updateCarFields: Record<number, Car | undefined>;
 }
 
 export const garageStore = createStore<State>({
   createCarFields: { color: '', id: Number.NaN, name: '' },
   currentPage: 1,
   totalCount: 0,
-  updateCarFields: { color: '', id: Number.NaN, name: '' },
+  updateCarFields: {},
 });
